@@ -2,7 +2,7 @@
 import shortid from "shortid"
 import devices from "../devices.json"
 
-export function getDevices(req, res) {
+export function getDevices(_, res) {
   res.json(devices)
 }
 
@@ -26,27 +26,19 @@ export function getDevice(req, res) {
 
 export function updateDevice(req, res) {
   const { id } = req.params
+  const foundDevice = devices.find(d => d.id === id)
+  if (foundDevice == -1) res.json(0)
+
   const { system_name, type, hdd_capacity } = req.body
-  let updated = false
-  devices.forEach(device => {
-    if(device.id === id) {
-      device.system_name = system_name
-      device.type = type
-      device.hdd_capacity = hdd_capacity
-      updated = true
-    }
-  })
-  res.json(updated ? 1 : 0)
+  Object.assign(foundDevice, { system_name, type, hdd_capacity })
+  res.json(1)
 }
 
 export function deleteDevice(req, res) {
   const { id } = req.params
-  let deleted = false
-  devices.forEach((device, i) => {
-    if(device.id === id) {
-      devices.splice(i, 1)
-      deleted = true
-    }
-  })
-  res.json(deleted ? 1 : 0)
+  const i = devices.findIndex((d => d.id === id))
+  if (i == -1) res.json(0)
+
+  devices.splice(i, 1)
+  res.json(1)
 }

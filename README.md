@@ -1,51 +1,24 @@
-Installation:
-------------
+# Senior Frontend Software Engineer Showcase
 
+## Installation
+- Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script)
+- Then:
 ```bash
-$ npm install
+pnpm run requirements
 ```
 
-
-Run:
-------------
+## Run
 
 ```bash
-$ npm start
+pnpm dev
 ```
 
+Google Chrome will pop up if you're using windows. Otherwise, navigate to http://localhost:5173
 
-API:
-------------
-
-Base url: `http://localhost:3000`
-
+## Build and Deploy
 
 ```bash
-GET /devices
+pnpm build
 ```
 
-
-```bash
-GET /devices/:id
-```
-
-
-```bash
-DELETE /devices/:id
-```
-
-
-```bash
-POST /devices
-```
-> |  Request Body                                                           | content-type          |
-> |:------------------------------------------------------------------------|:----------------------|
-> | `{"system_name": "DESKTOP-ONE","type": "WINDOWS","hdd_capacity": "92"}` | `application/json`    |
-
-
-```bash
-PUT /devices/:id
-```
-> |  Request Body                                                            | content-type          |
-> |:-------------------------------------------------------------------------|:----------------------|
-> | `{"system_name": "DESKTOP-OFFICE","type": "MAC","hdd_capacity": "500"}`  | `application/json`    |
+Deploy all contents under [`server`](server)
