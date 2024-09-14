@@ -16,4 +16,4 @@ consign()
 
 // Deployment integration
 app.use('/assets', express.static(join(__dirname, 'dist/assets')))
-app.use('/', (_, res) => res.sendFile(join(__dirname, 'dist/index.html')))
+app.use('/*', (_, res) => res.sendFile(join(__dirname, 'dist/index.html')))
