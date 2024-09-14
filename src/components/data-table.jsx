@@ -75,7 +75,13 @@ export default function DataTableDemo() {
       {
         id: 'actions',
         enableHiding: false,
-        cell: ({ row }) => <ActionMenu hoveredRow={hoveredRow} row={row} />,
+        cell: ({ row }) => (
+          <ActionMenu
+            setHoveredRow={setHoveredRow}
+            hoveredRow={hoveredRow}
+            row={row}
+          />
+        ),
       },
     ],
     [hoveredRow],
@@ -102,7 +108,12 @@ export default function DataTableDemo() {
   })
 
   return (
-    <div className='w-full'>
+    <a
+      className='w-full'
+      onMouseEnter={() => {
+        setHoveredRow(null)
+      }}
+    >
       <div className='flex items-center py-2'>
         {/*
         <Input
@@ -117,7 +128,11 @@ export default function DataTableDemo() {
       </div>
       <div className='rounded-md border'>
         <Table>
-          <TableHeader>
+          <TableHeader
+            onMouseEnter={() => {
+              setHoveredRow(null)
+            }}
+          >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className='hover:bg-[#F4F4F5]'>
                 {headerGroup.headers.map((header) => {
@@ -135,11 +150,7 @@ export default function DataTableDemo() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody
-            onMouseLeave={() => {
-              // setHoveredRow(null) // not perfect! once it gets to the trigger it goes away :/
-            }}
-          >
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -172,6 +183,6 @@ export default function DataTableDemo() {
         </Table>
       </div>
       <Toaster />
-    </div>
+    </a>
   )
 }

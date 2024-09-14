@@ -8,7 +8,6 @@ import {
 import { MoreHorizontal } from 'lucide-react'
 
 export default function ({ hoveredRow, row }) {
-  console.log(hoveredRow, row.id, hoveredRow == row.id)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,14 +21,24 @@ export default function ({ hoveredRow, row }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem
-          className='focus:bg-[#F4F4F5]'
-          // onClick={() => navigator.clipboard.writeText(payment.id)}
-        >
-          Edit
+        <DropdownMenuItem className='focus:cursor-pointer focus:bg-[#F4F4F5]'>
+          <a
+            className='cursor-pointer'
+            onClick={() => {
+              setHoveredRow(null)
+            }}
+          >
+            Edit
+          </a>
         </DropdownMenuItem>
-        <DropdownMenuItem className='text-[#D53948] focus:bg-[#F4F4F5] focus:text-[#D53948]'>
-          Delete
+        <DropdownMenuItem className='text-[#D53948] focus:cursor-pointer focus:bg-[#F4F4F5] focus:text-[#D53948]'>
+          <a
+            onClick={() => {
+              setHoveredRow(null)
+            }}
+          >
+            Delete
+          </a>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
