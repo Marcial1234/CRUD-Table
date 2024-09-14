@@ -13,15 +13,14 @@ export default function ({ hoveredRow, row }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant='ghost'
-          className={`${hoveredRow == row.id ? 'visible' : 'invisible'}
-            text=[#211F33] h-8 w-8 p-0 hover:bg-[#E8E8EA] focus-visible:bg-[#E8E8EA]`}
+          className={`${hoveredRow == row.id ? 'visible' : 'invisible'} h-8 w-8 p-0`}
         >
           <span className='sr-only'>Open menu</span>
           <MoreHorizontal className='h-4 w-4' />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem className='focus:cursor-pointer focus:bg-[#F4F4F5]'>
+        <DropdownMenuItem className='focus:cursor-pointer focus:bg-secondary-hover-background'>
           <a
             className='cursor-pointer'
             onClick={() => {
@@ -31,7 +30,7 @@ export default function ({ hoveredRow, row }) {
             Edit
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem className='text-[#D53948] focus:cursor-pointer focus:bg-[#F4F4F5] focus:text-[#D53948]'>
+        <DropdownMenuItem className='text-[#D53948] focus:cursor-pointer focus:bg-secondary-hover-background focus:text-[#D53948]'>
           <a
             onClick={() => {
               setHoveredRow(null)

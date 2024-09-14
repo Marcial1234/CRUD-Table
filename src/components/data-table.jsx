@@ -53,8 +53,6 @@ const data = [
   },
 ]
 
-// TODO: When empty, persist styles
-// hover background
 export default function DataTableDemo() {
   const [sorting, setSorting] = useState(/* <SortingState> */ [])
   const [columnFilters, setColumnFilters] = useState(/* <ColumnFiltersState> */ [])
@@ -66,7 +64,7 @@ export default function DataTableDemo() {
     () => [
       {
         accessorKey: 'device',
-        header: () => <div className='text-left text-[#211F33]'>Device</div>,
+        header: () => <div className='text-left text-primary'>Device</div>,
         cell: ({ row }) => {
           const device = row.getValue('device')
           return <div className='text-left font-medium'>{device}</div>
@@ -108,8 +106,6 @@ export default function DataTableDemo() {
   })
 
   return (
-    // revert back to plain <></> once the huge guy is done with
-    // co-locate component overfit here
     <>
       {/* Clickable element to reset visibily hovered-row */}
       <a
@@ -135,7 +131,7 @@ export default function DataTableDemo() {
           <Table>
             <TableHeader onMouseEnter={() => setHoveredRow(null)}>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className='hover:bg-[#F4F4F5]'>
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead key={header.id}>
@@ -155,12 +151,10 @@ export default function DataTableDemo() {
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
-                    className='hover:bg-[#F4F4F5]'
                     key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      //
                       <TableCell
                         className='text-end'
                         key={cell.id}

@@ -3,7 +3,7 @@ const { fontFamily } = require('tailwindcss/defaultTheme')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  content: ['src/**/*.{js,jsx}', 'components/**/*.{js,jsx}'],
+  content: ['src/**/*.{js,jsx,ts,tsx}', 'components/**/*.{js,jsx,ts,tsx}'],
   theme: {
     container: {
       center: true,
@@ -20,12 +20,14 @@ module.exports = {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          'DEFAULT': 'hsl(var(--primary))',
+          'foreground': 'hsl(var(--primary-foreground))',
+          'hover-background': 'hsl(var(--primary-hover-background))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          'DEFAULT': 'hsl(var(--secondary))',
+          'foreground': 'hsl(var(--secondary-foreground))',
+          'hover-background': 'hsl(var(--secondary-hover-background))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
@@ -56,7 +58,6 @@ module.exports = {
       },
       fontFamily: {
         sans: ["'Inter'", ...fontFamily.sans],
-        roboto: ['Roboto', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
