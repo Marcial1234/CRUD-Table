@@ -17,6 +17,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@tanstack/react-table": "^8.20.5",
+    "axios": "^1.7.7",
     "body-parser": "^1.19.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -27,6 +28,7 @@
     "morgan": "^1.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
     "shortid": "^2.2.16",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"

@@ -1,13 +1,24 @@
+import DataTableDemo from '@/components/data-table'
+import '@/global.css'
+import Layout from '@/layouts/Layout.jsx'
+import { StrategyProvider } from '@/proviers/strategy'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
-import App from '@/App.jsx'
-import '@/global.css'
-
-// import all contexts
+const router = createBrowserRouter([
+  {
+    path: '*',
+    element: <DataTableDemo />,
+  },
+])
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <StrategyProvider>
+      <Layout>
+        <RouterProvider router={router} />
+      </Layout>
+    </StrategyProvider>
   </StrictMode>,
 )

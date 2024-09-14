@@ -9,7 +9,7 @@ import {
 } from '@/components/shadcn/toast'
 import { useToast } from '@/components/shadcn/use-toast'
 
-export function Toaster() {
+export default function Toaster() {
   const { toasts } = useToast()
 
   return (

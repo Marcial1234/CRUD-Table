@@ -15,11 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
+import Toaster from '@/components/shadcn/toaster'
+import { StrategyContext } from '@/proviers/strategy'
 import {
-  // ColumnDef,
   // ColumnFiltersState,
   // SortingState,
-  // VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -28,7 +28,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
 const data /* : Payment[] */ = [
   {
@@ -63,14 +63,7 @@ const data /* : Payment[] */ = [
   },
 ]
 
-// export type Payment = {
-//   id: string
-//   device: 'number'
-//   status: "pending" | "processing" | "success" | "failed"
-//   email: string
-// }
-
-export const columns /* : ColumnDef<Payment>[] */ = [
+const columns = [
   {
     accessorKey: 'device',
     header: () => <div className='text-left text-[#211F33]'>Device</div>,
@@ -113,13 +106,13 @@ export const columns /* : ColumnDef<Payment>[] */ = [
 
 // TODO: When empty, persist styles
 // hover background
-export function DataTableDemo() {
+export default function DataTableDemo() {
   const [sorting, setSorting] = useState(/* <SortingState> */ [])
   const [columnFilters, setColumnFilters] = useState(/* <ColumnFiltersState> */ [])
-  const [columnVisibility, setColumnVisibility] = useState(
-    /* <VisibilityState> */ {},
-  )
   const [rowSelection, setRowSelection] = useState({})
+
+  // const strategy =
+  useContext(StrategyContext)
 
   const table = useReactTable({
     data,
@@ -130,12 +123,10 @@ export function DataTableDemo() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
       rowSelection,
     },
   })
@@ -143,14 +134,16 @@ export function DataTableDemo() {
   return (
     <div className='w-full'>
       <div className='flex items-center py-4'>
+        {/*
         <Input
           placeholder='Filter emails...'
-          value={table.getColumn('email')?.getFilterValue() /* as string */ ?? ''}
+          value={table.getColumn('email')?.getFilterValue() ?? ''}
           onChange={(event) =>
             table.getColumn('email')?.setFiltTperValue(event.target.value)
           }
           className='max-w-sm'
         />
+         */}
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -197,6 +190,7 @@ export function DataTableDemo() {
           </TableBody>
         </Table>
       </div>
+      <Toaster />
     </div>
   )
 }
