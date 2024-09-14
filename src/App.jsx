@@ -1,4 +1,4 @@
-import { DataTableDemo } from '@/components/shadcn/data-table'
+import { DataTableDemo } from '@/components/data-table'
 import { Toaster } from '@/components/shadcn/toaster'
 
 /* TODO: make custom VSCode Pluggin for this */
