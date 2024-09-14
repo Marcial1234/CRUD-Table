@@ -1,12 +1,13 @@
 /* Stipped TS version of https://ui.shadcn.com/docs/components/data-table */
-import { Button } from '@/components/shadcn/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/shadcn/dropdown-menu'
-import { Input } from '@/components/shadcn/input'
+// import { Button } from '@/components/shadcn/button'
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from '@/components/shadcn/dropdown-menu'
+// import { Input } from '@/components/shadcn/input'
+import ActionMenu from '@/components/__ud-actions-menu'
 import {
   Table,
   TableBody,
@@ -27,80 +28,28 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 
-const data /* : Payment[] */ = [
+const data = [
   {
     id: 'm5gr84i9',
     device: '316',
-    status: 'success',
-    email: 'ken99@yahoo.com',
   },
   {
     id: '3u1reuv4',
     device: '242',
-    status: 'success',
-    email: 'Abe45@gmail.com',
   },
   {
     id: 'derv1ws0',
     device: '837',
-    status: 'processing',
-    email: 'Monserrat44@gmail.com',
   },
   {
     id: '5kma53ae',
     device: '874',
-    status: 'success',
-    email: 'Silas22@gmail.com',
   },
   {
     id: 'bhqecj4p',
     device: '721',
-    status: 'failed',
-    email: 'carmella@hotmail.com',
-  },
-]
-
-const columns = [
-  {
-    accessorKey: 'device',
-    header: () => <div className='text-left text-[#211F33]'>Device</div>,
-    cell: ({ row }) => {
-      const device = row.getValue('device')
-      return <div className='text-left font-medium'>{device}</div>
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: (/* { row } */) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant='ghost'
-              className='text=[#211F33] h-8 w-8 p-0 hover:bg-[#E8E8EA] focus-visible:bg-[#E8E8EA]'
-            >
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem
-              className='focus:bg-[#F4F4F5]'
-              // onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem className='text-[#D53948] focus:bg-[#F4F4F5] focus:text-[#D53948]'>
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
   },
 ]
 
@@ -110,6 +59,27 @@ export default function DataTableDemo() {
   const [sorting, setSorting] = useState(/* <SortingState> */ [])
   const [columnFilters, setColumnFilters] = useState(/* <ColumnFiltersState> */ [])
   const [rowSelection, setRowSelection] = useState({})
+
+  const [hoveredRow, setHoveredRow] = useState() /* ID of row that's being hovered */
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'device',
+        header: () => <div className='text-left text-[#211F33]'>Device</div>,
+        cell: ({ row }) => {
+          const device = row.getValue('device')
+          return <div className='text-left font-medium'>{device}</div>
+        },
+      },
+      {
+        id: 'actions',
+        enableHiding: false,
+        cell: ({ row }) => <ActionMenu hoveredRow={hoveredRow} row={row} />,
+      },
+    ],
+    [hoveredRow],
+  )
 
   // const strategy =
   useContext(StrategyContext)
@@ -133,7 +103,7 @@ export default function DataTableDemo() {
 
   return (
     <div className='w-full'>
-      <div className='flex items-center py-4'>
+      <div className='flex items-center py-2'>
         {/*
         <Input
           placeholder='Filter emails...'
@@ -165,7 +135,11 @@ export default function DataTableDemo() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody
+            onMouseLeave={() => {
+              // setHoveredRow(null) // not perfect! once it gets to the trigger it goes away :/
+            }}
+          >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -174,7 +148,14 @@ export default function DataTableDemo() {
                   data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className='text-end' key={cell.id}>
+                    //
+                    <TableCell
+                      className='text-end'
+                      key={cell.id}
+                      onMouseEnter={() => {
+                        setHoveredRow(cell.row.id)
+                      }}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
