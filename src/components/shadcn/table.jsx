@@ -14,16 +14,12 @@ const Table = forwardRef(({ className, ...props }, ref) => (
 Table.displayName = 'Table'
 
 const TableHeader = forwardRef(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead ref={ref} className={className} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
 const TableBody = forwardRef(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn('[&_tr:last-child]:border-0', className)}
-    {...props}
-  />
+  <tbody ref={ref} className={className} {...props} />
 ))
 TableBody.displayName = 'TableBody'
 
@@ -31,7 +27,7 @@ const TableRow = forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      'border-b transition-colors hover:bg-secondary-hover-background data-[state=selected]:bg-muted',
+      'border-b border-primary-hover-background transition-colors hover:bg-secondary-hover-background data-[state=selected]:bg-muted',
       className,
     )}
     {...props}

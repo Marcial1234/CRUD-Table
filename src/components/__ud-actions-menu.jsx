@@ -21,23 +21,12 @@ export default function ({ hoveredRow, row }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuItem className='focus:cursor-pointer focus:bg-secondary-hover-background'>
-          <a
-            className='cursor-pointer'
-            onClick={() => {
-              setHoveredRow(null)
-            }}
-          >
+          <a className='cursor-pointer' onClick={() => setHoveredRow(null)}>
             Edit
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem className='text-[#D53948] focus:cursor-pointer focus:bg-secondary-hover-background focus:text-[#D53948]'>
-          <a
-            onClick={() => {
-              setHoveredRow(null)
-            }}
-          >
-            Delete
-          </a>
+          <a onClick={() => setHoveredRow(null)}>Delete</a>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
