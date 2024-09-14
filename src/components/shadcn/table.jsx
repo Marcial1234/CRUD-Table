@@ -1,5 +1,5 @@
 /* Stipped TS version of https://ui.shadcn.com/docs/components/table */
-import {forwardRef} from "react"
+import { forwardRef } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -73,22 +73,21 @@ const TableCell = forwardRef(({ className, ...props }, ref) => (
 ))
 TableCell.displayName = "TableCell"
 
-const TableCaption = forwardRef(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-TableCaption.displayName = "TableCaption"
+// const TableCaption = forwardRef(({ className, ...props }, ref) => (
+//   <caption
+//     ref={ref}
+//     className={cn("mt-4 text-sm text-muted-foreground", className)}
+//     {...props}
+//   />
+// ))
+// TableCaption.displayName = "TableCaption"
 
 export {
   Table,
-  TableHeader,
   TableBody,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
-  TableCaption,
 }

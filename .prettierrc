@@ -14,7 +14,7 @@
     "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ],
-  "printWidth": 100,
+  "printWidth": 90,
   "quoteProps": "consistent",
   "semi": false,
   "singleQuote": true,
