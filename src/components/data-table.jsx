@@ -7,7 +7,9 @@
 //   DropdownMenuTrigger,
 // } from '@/components/shadcn/dropdown-menu'
 // import { Input } from '@/components/shadcn/input'
+import PlusIcon from '@/assets/plus.svg?react'
 import ActionMenu from '@/components/__ud-actions-menu'
+import { Button } from '@/components/shadcn/button'
 import {
   Table,
   TableBody,
@@ -109,25 +111,26 @@ export default function DataTableDemo() {
   return (
     <>
       {/* Clickable element to reset visibily hovered-row */}
-      <a
+      {/* <a
         className='absolute left-0 top-0 min-h-[100%] min-w-[100%]'
         onMouseEnter={() => setHoveredRow(null)}
       >
         &nbsp;
-      </a>{' '}
+      </a> */}
       <div>
-        <div className='flex items-center py-2'>
-          {/*
-        <Input
-          placeholder='Filter emails...'
-          value={table.getColumn('email')?.getFilterValue() ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFiltTperValue(event.target.value)
-          }
-          className='max-w-sm'
-        />
-         */}
+        <div
+          className='flex items-center justify-between py-6 text-2xl font-medium'
+          style={{ zIndex: 1 }}
+        >
+          Devices
+          <Button className='bg-[#337AB7]'>
+            <PlusIcon /> &nbsp; Add device
+          </Button>
         </div>
+        {/* there is another way.. */}
+        <div>ahoy!</div>
+        <div className='py-1'></div>
+        {/* there is another way.. */}
         <Table>
           <TableHeader onMouseEnter={() => setHoveredRow(null)}>
             {table.getHeaderGroups().map((headerGroup) => (
