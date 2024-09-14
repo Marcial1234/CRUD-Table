@@ -108,14 +108,19 @@ export default function DataTableDemo() {
   })
 
   return (
-    <a
-      className='w-full'
-      onMouseEnter={() => {
-        setHoveredRow(null)
-      }}
-    >
-      <div className='flex items-center py-2'>
-        {/*
+    // revert back to plain <></> once the huge guy is done with
+    // co-locate component overfit here
+    <>
+      {/* Clickable element to reset visibily hovered-row */}
+      <a
+        className='absolute left-0 top-0 min-h-[100%] min-w-[100%]'
+        onMouseEnter={() => setHoveredRow(null)}
+      >
+        &nbsp;
+      </a>{' '}
+      <div>
+        <div className='flex items-center py-2'>
+          {/*
         <Input
           placeholder='Filter emails...'
           value={table.getColumn('email')?.getFilterValue() ?? ''}
@@ -125,64 +130,61 @@ export default function DataTableDemo() {
           className='max-w-sm'
         />
          */}
-      </div>
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader
-            onMouseEnter={() => {
-              setHoveredRow(null)
-            }}
-          >
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-[#F4F4F5]'>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className='hover:bg-[#F4F4F5]'
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    //
-                    <TableCell
-                      className='text-end'
-                      key={cell.id}
-                      onMouseEnter={() => {
-                        setHoveredRow(cell.row.id)
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+        </div>
+        <div className='rounded-md border'>
+          <Table>
+            <TableHeader onMouseEnter={() => setHoveredRow(null)}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className='hover:bg-[#F4F4F5]'>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    className='hover:bg-[#F4F4F5]'
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      //
+                      <TableCell
+                        className='text-end'
+                        key={cell.id}
+                        onMouseEnter={() => {
+                          setHoveredRow(cell.row.id)
+                        }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className='h-24 text-center'>
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <Toaster />
       </div>
-      <Toaster />
-    </a>
+    </>
   )
 }
