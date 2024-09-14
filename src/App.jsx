@@ -1,11 +1,15 @@
-import AppleIcon from './assets/apple.svg?react'; /* TODO: make custom VSCode Pluggin for this */
+import { DataTableDemo } from '@/components/shadcn/data-table'
+import { Toaster } from '@/components/shadcn/toaster'
 
-import { DataTableDemo } from "@/components/shadcn/data-table";
+/* TODO: make custom VSCode Pluggin for this */
+import AppleIcon from './assets/apple.svg?react'
 
 export default function App() {
   return (
     <>
-     <DataTableDemo />
+      <AppleIcon />
+      <DataTableDemo />
+      <Toaster />
     </>
   )
 }
