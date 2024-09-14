@@ -1,4 +1,4 @@
-import DataTableDemo from '@/components/data-table'
+import DataTableDemo from '@/components/data-table/table'
 import '@/global.css'
 import Layout from '@/layouts/Layout.jsx'
 import { StrategyProvider } from '@/proviers/strategy'

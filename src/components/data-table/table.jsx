@@ -8,7 +8,9 @@
 // } from '@/components/shadcn/dropdown-menu'
 // import { Input } from '@/components/shadcn/input'
 import PlusIcon from '@/assets/plus.svg?react'
-import ActionMenu from '@/components/__ud-actions-menu'
+import RefreshIcon from '@/assets/refresh.svg?react'
+import ActionMenu from '@/components/data-table/crud-menu'
+import Device from '@/components/device'
 import { Button } from '@/components/shadcn/button'
 import {
   Table,
@@ -19,7 +21,8 @@ import {
   TableRow,
 } from '@/components/shadcn/table'
 import Toaster from '@/components/shadcn/toaster'
-import { StrategyContext } from '@/proviers/strategy'
+import Tooltip from '@/components/shadcn/tooltip'
+// import { StrategyContext } from '@/proviers/strategy'
 import {
   // ColumnFiltersState,
   // SortingState,
@@ -30,28 +33,24 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useContext, useMemo, useState } from 'react'
+import {
+  /* useContext, */
+  useMemo,
+  useState,
+} from 'react'
 
 const data = [
   {
     id: 'm5gr84i9',
-    device: '316',
+    device: <Device system_name="Nikoole's" hdd_capacity='9999' type='windows' />,
   },
   {
     id: '3u1reuv4',
-    device: '242',
+    device: <Device system_name="Oink's" hdd_capacity={1.247e24} type='linux' />,
   },
   {
     id: 'derv1ws0',
-    device: '837',
-  },
-  {
-    id: '5kma53ae',
-    device: '874',
-  },
-  {
-    id: 'bhqecj4p',
-    device: '721',
+    device: <Device system_name="Oink's" hdd_capacity='1018' type='mac' />,
   },
 ]
 
@@ -67,15 +66,15 @@ export default function DataTableDemo() {
       {
         accessorKey: 'device',
         header: () => <div className='text-left text-primary'>Device</div>,
-        cell: ({ row }) => {
-          const device = row.getValue('device')
-          return <div className='text-left font-medium'>{device}</div>
-        },
+        cell: ({ row }) => (
+          <div className='text-left font-medium'>{row.getValue('device')}</div>
+        ),
       },
       {
         id: 'actions',
         enableHiding: false,
         cell: ({ row }) => (
+          // expand this comp to "History", if available
           <ActionMenu
             setHoveredRow={setHoveredRow}
             hoveredRow={hoveredRow}
@@ -88,7 +87,7 @@ export default function DataTableDemo() {
   )
 
   // const strategy =
-  useContext(StrategyContext)
+  // useContext(StrategyContext)
 
   const table = useReactTable({
     data,
@@ -107,7 +106,6 @@ export default function DataTableDemo() {
     },
   })
 
-  // TODO: only bottom border
   return (
     <>
       {/* Clickable element to reset visibily hovered-row */}
@@ -123,14 +121,29 @@ export default function DataTableDemo() {
           style={{ zIndex: 1 }}
         >
           Devices
-          <Button className='bg-[#337AB7]'>
+          <Button
+            className='bg-[#337AB7] hover:bg-[#0054AE]'
+            onClick={() => alert('tbd!')}
+          >
             <PlusIcon /> &nbsp; Add device
           </Button>
         </div>
-        {/* there is another way.. */}
-        <div>ahoy!</div>
-        <div className='py-1'></div>
-        {/* there is another way.. */}
+        <div className='flex justify-between py-1'>
+          <div className='flex gap-3'>
+            {/* <Input /> */}
+            {/* <Droppdown> */}
+            {/* <Droppdown> */}
+            {/* <Droppdown> */}
+            <div>many</div>
+            <div>things</div>
+            <div>on here</div>
+          </div>
+          <Tooltip content='Reset All Table Changes'>
+            <Button className='px-3' variant='ghost' onClick={() => alert('tbd!')}>
+              <RefreshIcon />
+            </Button>
+          </Tooltip>
+        </div>
         <Table>
           <TableHeader onMouseEnter={() => setHoveredRow(null)}>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -155,6 +168,7 @@ export default function DataTableDemo() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  // className='p-100'
                   data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (

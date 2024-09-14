@@ -4,6 +4,7 @@ import { createContext, useEffect, useState } from 'react'
 const StrategyContext = createContext()
 
 function StrategyProvider({ children }) {
+  // make into light/dark theme post co-locating
   const [seed, setSeed] = useState(-1)
 
   useEffect(() => {
