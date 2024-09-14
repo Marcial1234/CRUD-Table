@@ -7,7 +7,7 @@ pnpm run requirements
 ```
 
 ## Cleanup
-The install script install two global dependencies:
+The `requirements` script installs two global dependencies:
 
 - [`concurrently`](https://www.npmjs.com/package/concurrently)
 - [`babel-watch`](https://www.npmjs.com/package/babel-watch)
