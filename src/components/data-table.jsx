@@ -73,7 +73,7 @@ const data /* : Payment[] */ = [
 export const columns /* : ColumnDef<Payment>[] */ = [
   {
     accessorKey: 'device',
-    header: () => <div className='text-left'>Device</div>,
+    header: () => <div className='text-left text-[#211F33]'>Device</div>,
     cell: ({ row }) => {
       const device = row.getValue('device')
       return <div className='text-left font-medium'>{device}</div>
@@ -85,19 +85,23 @@ export const columns /* : ColumnDef<Payment>[] */ = [
     cell: (/* { row } */) => {
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              className='text=[#211F33] h-8 w-8 p-0 hover:bg-[#E8E8EA] focus-visible:bg-[#E8E8EA]'
+            >
               <span className='sr-only'>Open menu</span>
               <MoreHorizontal className='h-4 w-4' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuItem
-            // onClick={() => navigator.clipboard.writeText(payment.id)}
+              className='focus:bg-[#F4F4F5]'
+              // onClick={() => navigator.clipboard.writeText(payment.id)}
             >
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem className='text-[#D53948] focus:text-[#D53948]'>
+            <DropdownMenuItem className='text-[#D53948] focus:bg-[#F4F4F5] focus:text-[#D53948]'>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -108,6 +112,7 @@ export const columns /* : ColumnDef<Payment>[] */ = [
 ]
 
 // TODO: When empty, persist styles
+// hover background
 export function DataTableDemo() {
   const [sorting, setSorting] = useState(/* <SortingState> */ [])
   const [columnFilters, setColumnFilters] = useState(/* <ColumnFiltersState> */ [])
@@ -142,7 +147,7 @@ export function DataTableDemo() {
           placeholder='Filter emails...'
           value={table.getColumn('email')?.getFilterValue() /* as string */ ?? ''}
           onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
+            table.getColumn('email')?.setFiltTperValue(event.target.value)
           }
           className='max-w-sm'
         />
@@ -151,7 +156,7 @@ export function DataTableDemo() {
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className='hover:bg-[#F4F4F5]'>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -171,6 +176,7 @@ export function DataTableDemo() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className='hover:bg-[#F4F4F5]'
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
