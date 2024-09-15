@@ -1,4 +1,4 @@
-import { Button } from '@/components/shadcn/button'
+import Button from '@/components/shadcn/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,10 +7,10 @@ import {
 } from '@/components/shadcn/dropdown-menu'
 import { MoreHorizontal } from 'lucide-react'
 
-export default function Menu({ hoveredRow, setHoveredRow, row: { id } }) {
+export default function Menu({ hoveredRow, keepOpen, close, row: { id } }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild onMouseEnter={keepOpen}>
         <Button
           variant='ghost'
           className={`${hoveredRow == id ? 'visible' : 'invisible'}
@@ -20,12 +20,12 @@ export default function Menu({ hoveredRow, setHoveredRow, row: { id } }) {
           <MoreHorizontal className='h-4 w-4' />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent align='end' onMouseLeave={close}>
         <DropdownMenuItem className='focus:cursor-pointer focus:bg-secondary-hover-background'>
-          <a onClick={() => setHoveredRow(null)}>Edit</a>
+          Edit
         </DropdownMenuItem>
         <DropdownMenuItem className='text-red-600 focus:cursor-pointer focus:bg-secondary-hover-background '>
-          <a onClick={() => setHoveredRow(null)}>Delete</a>
+          Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
