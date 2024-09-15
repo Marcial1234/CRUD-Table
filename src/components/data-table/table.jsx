@@ -1,10 +1,11 @@
 /* Inspiration: https://ui.shadcn.com/docs/components/data-table */
-// import { Input } from '@/components/shadcn/input'
 import PlusIcon from '@/assets/plus.svg?react'
 import RefreshIcon from '@/assets/refresh.svg?react'
+import SearchIcon from '@/assets/search.svg?react'
 import ActionMenu from '@/components/data-table/crud-menu'
 import Device from '@/components/device'
 import Button from '@/components/shadcn/button'
+import Input from '@/components/shadcn/input'
 import {
   Table,
   TableBody,
@@ -17,17 +18,14 @@ import Toaster from '@/components/shadcn/toaster'
 import Tooltip from '@/components/shadcn/tooltip'
 // import { StrategyContext } from '@/proviers/strategy'
 import {
-  // ColumnFiltersState,
-  // SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import {
   /* useContext, */
+  useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -35,37 +33,51 @@ import {
 const data = [
   {
     id: 'm5gr84i9',
-    device: <Device system_name="Nikoole's" hdd_capacity='9999' type='windows' />,
+    system_name: "Nikoole's",
+    hdd_capacity: 9999,
+    type: 'windows',
   },
   {
     id: '3u1reuv4',
-    device: <Device system_name="Oink's" hdd_capacity={1.247e24} type='linux' />,
+    system_name: "Oink's",
+    hdd_capacity: 1.247e24,
+    type: 'linux',
   },
   {
     id: 'derv1ws0',
-    device: <Device system_name="Oink's" hdd_capacity='1018' type='mac' />,
+    system_name: "Oink's",
+    hdd_capacity: 1018,
+    type: 'mac',
   },
 ]
 
 export default function DataTable() {
-  const [sorting, setSorting] = useState(/* <SortingState> */ [])
-  const [columnFilters, setColumnFilters] = useState(/* <ColumnFiltersState> */ [])
-  const [rowSelection, setRowSelection] = useState({})
+  const [globalFilter, setGlobalFilter] = useState('')
+
+  /*** Fields for determining action column visiblity ****/
   const [hoveredRow, setHoveredRow] = useState() /* ID of row that's being hovered */
   const [keepOpen, setKeepOpen] = useState(false)
+  /*****/
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'device',
+        id: 'display',
+        accessorFn: ({ system_name, hdd_capacity, type }) =>
+          system_name + hdd_capacity + type,
         header: () => <div className='text-left text-primary'>Device</div>,
         cell: ({ row }) => (
-          <div className='text-left font-medium'>{row.getValue('device')}</div>
+          <div className='text-left font-medium'>
+            <Device
+              name={row.original['system_name']}
+              hdd={row.original['hdd_capacity']}
+              type={row.original['type']}
+            />
+          </div>
         ),
       },
       {
         id: 'actions',
-        enableHiding: false,
         cell: ({ row }) => (
           <a onMouseLeave={() => setKeepOpen(false)}>
             {/* // expand this comp to "History", if available */}
@@ -88,19 +100,16 @@ export default function DataTable() {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-      columnFilters,
-      rowSelection,
-    },
+    // sort later...
   })
+
+  useEffect(() => document.getElementById('globalFilter').focus(), [])
 
   return (
     <>
@@ -116,24 +125,33 @@ export default function DataTable() {
           <PlusIcon /> &nbsp; Add device
         </Button>
       </div>
-      <div className='flex justify-between py-1'>
+      <div className='flex justify-between py-2'>
         <div className='flex gap-3'>
-          {/* <Input /> */}
-          {/* <Droppdown> */}
-          {/* <Droppdown> */}
-          {/* <Droppdown> */}
-          <div>many</div>
-          <div>things</div>
-          <div>on here</div>
+          <div className='flex items-center'>
+            <SearchIcon className='absolute ml-3 h-3' />
+            <Input
+              autofocus
+              id='globalFilter'
+              value={globalFilter} /* TODO: get from query param */
+              className='min-w-64 pl-8'
+              placeholder='Search details within all devices'
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+          </div>
+          {/* <Input placeholder='Sort' />
+          <Input placeholder='Filter' /> */}
+          {/* Tooltip? Filter Table Content */}
         </div>
         <Tooltip content='Reset All Table Changes'>
-          <Button
-            asChild
-            className='px-3'
-            variant='ghost'
-            onClick={() => alert('tbd!')}
-          >
+          <Button className='px-3' variant='ghost' onClick={() => alert('tbd!')}>
             <RefreshIcon />
+            {/*
+             If we can figure it out...
+              style={{
+                transition: '.5s ease-in-out',
+                rotate: '1.5turn',
+              }}
+            */}
           </Button>
         </Tooltip>
       </div>

@@ -2,7 +2,7 @@ import WindowsIcon from '@/assets/Windows.svg?react'
 import AppleIcon from '@/assets/apple.svg?react'
 import LinuxIcon from '@/assets/linux.svg?react'
 
-export default function Device({ system_name, hdd_capacity, type }) {
+export default function Device({ name, hdd, type }) {
   const typeIcons = {
     WINDOWS: <WindowsIcon />,
     LINUX: <LinuxIcon />,
@@ -43,11 +43,11 @@ export default function Device({ system_name, hdd_capacity, type }) {
   return (
     <div className='grid'>
       <div className='flex items-center gap-1'>
-        {typeIcons[type.toUpperCase()]} {system_name.toUpperCase()}
+        {typeIcons[type.toUpperCase()]} {name.toUpperCase()}
       </div>
       <span className='text-sm font-normal text-muted-foreground'>
         {capitalize[type.toUpperCase()]} Workstation -{' '}
-        {calculateCapacity(Number(hdd_capacity))}B
+        {calculateCapacity(Number(hdd))}B
       </span>
     </div>
   )
