@@ -13,7 +13,7 @@ function wait(ms) {
 
 export function getDevices(_, res) {
   // Force Show Skeleton :)
-  if (wait(2000)) res.json(devices)
+  if (wait(1_000)) res.json(devices)
   // res.json(devices)
 }
 

@@ -5,23 +5,22 @@ import { Suspense, useDeferredValue, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 export default function Page() {
-  const [data, setData] = useState([])
-  const deferredData = useDeferredValue(data)
+  const [_data, setData] = useState([])
+  const deferredData = useDeferredValue(_data)
 
-  const { data: _data } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ['getAllDevices'],
     queryFn: getAllDevices,
   })
   useEffect(() => {
-    setData(_data)
+    setData(data)
   }, [deferredData])
   // mutation.mutate(new FormData(event.target))
 
   return (
     <ErrorBoundary fallback={<div>Something went wrong... That's all we know</div>}>
       <Suspense fallback={<Skeleton />}>
-        <DataTable data={deferredData} />
-        {/* <Skeleton /> */}
+        {isLoading || isFetching ? <Skeleton /> : <DataTable data={deferredData} />}
       </Suspense>
     </ErrorBoundary>
   )

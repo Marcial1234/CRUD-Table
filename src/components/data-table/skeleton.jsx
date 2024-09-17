@@ -19,7 +19,7 @@ import SortMenu from './sort-menu'
 export default function () {
   return (
     <>
-      <div className='flex items-center justify-between py-5 text-2xl font-medium'>
+      <div className='flex items-center justify-between pb-4 pt-[0.825rem] text-2xl font-medium'>
         Devices
         <Button className='animate-pulse bg-muted text-transparent'>
           + &nbsp; Add device
