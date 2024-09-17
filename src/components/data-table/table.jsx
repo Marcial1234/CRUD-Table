@@ -66,6 +66,7 @@ export default function DataTable({ data = dummy }) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState([])
+
   const resetAllFilters = () => {
     setSorting([])
     setColumnFilters([])
@@ -79,9 +80,17 @@ export default function DataTable({ data = dummy }) {
     if (queryParams.get('q')) setGlobalFilter(decodeURI(queryParams.get('q')))
   }, [queryParams])
   useEffect(() => {
-    if (deferredGlobalFilter !== '' && deferredGlobalFilter != queryParams.get('q'))
+    if (deferredGlobalFilter !== '' && deferredGlobalFilter !== queryParams.get('q'))
       setQueryParams({ q: encodeURI(globalFilter) })
+
+    if (deferredGlobalFilter == '') {
+      setQueryParams((qps) => {
+        qps.delete('q')
+        return qps
+      })
+    }
   }, [deferredGlobalFilter])
+  /*****/
 
   /*** Fields for determining action column visiblity ****/
   const [hoveredRow, setHoveredRow] = useState('')
@@ -158,7 +167,7 @@ export default function DataTable({ data = dummy }) {
               value.some((v) =>
                 v.toLowerCase().includes(row.getValue(id).toLowerCase()),
               )
-            : value.includes(row.getValue(id)),
+            : value.toLowerCase().includes(row.getValue(id).toLowerCase()),
       },
     ],
     [hoveredRow],
@@ -191,7 +200,7 @@ export default function DataTable({ data = dummy }) {
   return (
     <>
       <Toaster /> {/* Required to use `Toasts` */}
-      <div className='flex items-center justify-between py-5 text-2xl font-medium'>
+      <div className='flex items-center justify-between pb-4 pt-[0.825rem] text-2xl font-medium'>
         Devices
         <Button
           className='bg-[#337AB7] hover:bg-[#0054AE]'
@@ -256,7 +265,7 @@ export default function DataTable({ data = dummy }) {
           </Button>
         </Tooltip>
       </div>
-      <Table>
+      <Table className='mb-3'>
         <TableHeader>
           {table.getHeaderGroups().map(({ id, headers }) => (
             <TableRow className='hover:bg-transparent' key={id}>

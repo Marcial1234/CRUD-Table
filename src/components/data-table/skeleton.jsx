@@ -34,8 +34,8 @@ export default function () {
             </div>
           </div>
           <FilterMenu disabled title='Bananas' />
-          <SortMenu disabled={true} title='Snails' />
-          <SortMenu disabled={true} title='Coconuts' />
+          <SortMenu disabled title='Snails' />
+          <SortMenu disabled title='Coconuts' />
         </div>
         <div className='animate-pulse bg-muted'>
           <Button className='px-3' variant='ghost' disabled>

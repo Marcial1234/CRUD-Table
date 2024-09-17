@@ -17,7 +17,7 @@ import { CheckIcon } from '@radix-ui/react-icons'
 
 function Skeleton({ title }) {
   return (
-    <Button variant='outline' className='w-60 border-dashed font-normal'>
+    <Button variant='outline' disabled className='w-60 border-dashed font-normal'>
       <FilterIcon className='mr-2' />
       Filter by {title}
     </Button>
@@ -86,9 +86,10 @@ export default function FacetedFilter({ column, title, options, disabled }) {
                   onSelect={() => {
                     if (isSelected) selectedValues.delete(option.value)
                     else selectedValues.add(option.value)
-                    column.setFilterValue(
-                      selectedValues.length ? undefined : Array.from(selectedValues),
-                    )
+                    const filters = selectedValues.length
+                      ? undefined
+                      : Array.from(selectedValues)
+                    column.setFilterValue(filters)
                   }}
                   className='ml-1 flex items-center gap-1'
                 >

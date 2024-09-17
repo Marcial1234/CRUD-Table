@@ -1,9 +1,20 @@
+import shortid from 'shortid'
 
-import shortid from "shortid"
-import devices from "../devices.json"
+import devices from '../devices.json'
+
+function wait(ms) {
+  var start = Date.now(),
+    now = start
+  while (now - start < ms) {
+    now = Date.now()
+  }
+  return true
+}
 
 export function getDevices(_, res) {
-  res.json(devices)
+  // Force Show Skeleton :)
+  if (wait(2000)) res.json(devices)
+  // res.json(devices)
 }
 
 export function addDevice(req, res) {
@@ -12,7 +23,7 @@ export function addDevice(req, res) {
     id: shortid.generate(),
     system_name,
     type,
-    hdd_capacity
+    hdd_capacity,
   }
   devices.push(newDevice)
   res.json(newDevice)
@@ -20,13 +31,13 @@ export function addDevice(req, res) {
 
 export function getDevice(req, res) {
   const { id } = req.params
-  const device = devices.find(d => d.id === id)
+  const device = devices.find((d) => d.id === id)
   res.json(device)
 }
 
 export function updateDevice(req, res) {
   const { id } = req.params
-  const foundDevice = devices.find(d => d.id === id)
+  const foundDevice = devices.find((d) => d.id === id)
   if (foundDevice == -1) res.json(0)
 
   const { system_name, type, hdd_capacity } = req.body
@@ -36,7 +47,7 @@ export function updateDevice(req, res) {
 
 export function deleteDevice(req, res) {
   const { id } = req.params
-  const i = devices.findIndex((d => d.id === id))
+  const i = devices.findIndex((d) => d.id === id)
   if (i == -1) res.json(0)
 
   devices.splice(i, 1)
