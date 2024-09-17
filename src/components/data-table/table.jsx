@@ -62,7 +62,7 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 ))
 NoResults.displayName = 'NoResults'
 
-export default function DataTable({ data = dummy }) {
+export default function DataTable({ data = dummy, reset }) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState([])
@@ -257,8 +257,8 @@ export default function DataTable({ data = dummy }) {
             className='px-3'
             variant='ghost'
             onClick={() => {
-              alert('tbd!')
               resetAllFilters()
+              reset()
             }}
           >
             <RefreshIcon />

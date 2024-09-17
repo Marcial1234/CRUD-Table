@@ -8,7 +8,7 @@ export default function Page() {
   const [_data, setData] = useState([])
   const deferredData = useDeferredValue(_data)
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['getAllDevices'],
     queryFn: getAllDevices,
   })
@@ -20,7 +20,11 @@ export default function Page() {
   return (
     <ErrorBoundary fallback={<div>Something went wrong... That's all we know</div>}>
       <Suspense fallback={<Skeleton />}>
-        {isLoading || isFetching ? <Skeleton /> : <DataTable data={deferredData} />}
+        {isLoading || isFetching ? (
+          <Skeleton />
+        ) : (
+          <DataTable data={deferredData} reset={refetch} />
+        )}
       </Suspense>
     </ErrorBoundary>
   )

@@ -39,7 +39,7 @@ export default function () {
         </div>
         <div className='animate-pulse bg-muted'>
           <Button className='px-3' variant='ghost' disabled>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp;
           </Button>
         </div>
       </div>
