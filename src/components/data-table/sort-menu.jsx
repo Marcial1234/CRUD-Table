@@ -29,6 +29,7 @@ export default function Menu({ title, toggle, tableSorting, id, disabled }) {
   return (
     <Tooltip content={`Next sorting order: ${liteDirectionEnumMap[sort]}`}>
       <Button
+        disabled={disabled}
         variant='outline'
         className='border-dashed font-normal focus:bg-secondary-hover-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
         onClick={toggleSort}
