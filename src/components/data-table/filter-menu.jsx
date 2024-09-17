@@ -1,6 +1,6 @@
 import FilterIcon from '@/assets/filter.svg?react'
 import { Badge } from '@/components/shadcn/badge'
-import { Button } from '@/components/shadcn/button'
+import Button from '@/components/shadcn/button'
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,18 @@ import { Separator } from '@/components/shadcn/separator'
 import { capitalize, cn } from '@/lib/utils'
 import { CheckIcon } from '@radix-ui/react-icons'
 
-export default function FacetedFilter({ column, title, options }) {
+function Skeleton({ title }) {
+  return (
+    <Button variant='outline' className='w-60 border-dashed font-normal'>
+      <FilterIcon className='mr-2' />
+      Filter by {title}
+    </Button>
+  )
+}
+
+export default function FacetedFilter({ column, title, options, disabled }) {
+  if (disabled) return <Skeleton title={title} />
+
   const facets = column.getFacetedUniqueValues()
   const facetsKeys = Array.from(new Map([...facets].reverse()).keys())
   const selectedValues = new Set(column.getFilterValue())

@@ -1,12 +1,13 @@
-import { Button } from '@/components/shadcn/button'
+import Button from '@/components/shadcn/button'
 import Tooltip from '@/components/shadcn/tooltip'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export default function Menu({ title, toggle, tableSorting, id }) {
+export default function Menu({ title, toggle, tableSorting, id, disabled }) {
   const [sort, setSorting] = useState(0)
 
   useEffect(() => {
+    if (disabled) return
     if (
       !tableSorting.length ||
       (tableSorting.length == 1 && tableSorting[0].id !== id)

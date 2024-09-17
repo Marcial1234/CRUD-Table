@@ -1,4 +1,4 @@
-/* https://ui.shadcn.com/docs/components/button */
+/* Stipped TS version of https://ui.shadcn.com/docs/components/button */
 import { cn } from '@/lib/utils'
 import { Slot } from '@radix-ui/react-slot'
 import {
@@ -42,7 +42,7 @@ const buttonVariants = cva(
 //   asChild?: boolean
 // }
 
-export const Button = forwardRef(
+const Button = forwardRef(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
     return (
@@ -55,3 +55,4 @@ export const Button = forwardRef(
   },
 )
 Button.displayName = 'Button'
+export default Button

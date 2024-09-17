@@ -1,4 +1,4 @@
-/* https://ui.shadcn.com/docs/components/progress */
+/* Stipped TS version of https://ui.shadcn.com/docs/components/progress */
 import { Progress } from '@/components/ui/progress'
 import { useEffect, useState } from 'react'
 

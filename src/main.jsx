@@ -11,8 +11,9 @@ const router = createBrowserRouter([
     element: (
       // query provider...
       // normal providers...
-      <Suspense fallback={<p>Loading...</p>}>
-        <Skeleton />
+      <Suspense fallback={<Skeleton />}>
+        <DataTable />
+        {/* <Skeleton /> */}
       </Suspense>
     ),
   },

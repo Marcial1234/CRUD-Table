@@ -3,7 +3,7 @@ import PlusIcon from '@/assets/plus.svg?react'
 import RefreshIcon from '@/assets/refresh.svg?react'
 import SearchIcon from '@/assets/search.svg?react'
 import Device from '@/components/device'
-import { Button } from '@/components/shadcn/button'
+import Button from '@/components/shadcn/button'
 import Input from '@/components/shadcn/input'
 import {
   Table,
@@ -201,7 +201,7 @@ export default function DataTable({ data = dummy }) {
         </Button>
       </div>
       {/* Table Options */}
-      <div className='flex flex-wrap justify-between gap-2 py-2'>
+      <div className='flex flex-row flex-nowrap items-center justify-between gap-2 py-2'>
         <div className='flex flex-wrap gap-3'>
           <div className='flex w-80 items-center'>
             <SearchIcon className='absolute ml-3 h-3' />
@@ -220,8 +220,8 @@ export default function DataTable({ data = dummy }) {
             .map((col, i) => (
               <FilterMenu
                 key={i}
-                title='Device Type'
                 column={col}
+                title='Device Type'
                 options={filterOptions}
               />
             ))}

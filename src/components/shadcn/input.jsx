@@ -1,4 +1,4 @@
-/* https://ui.shadcn.com/docs/components/input */
+/* Stipped TS version of https://ui.shadcn.com/docs/components/input */
 import { cn } from '@/lib/utils'
 import { forwardRef } from 'react'
 

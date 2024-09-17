@@ -7,7 +7,7 @@
     "requirements": "pnpm store prune && pnpm i -g concurrently babel-watch && pnpm i && pnpm dev",
     "dev": "concurrently \"babel-watch server/index.js\" \"start chrome http://localhost:5173/\" \"vite dev\"",
     "server": "concurrently \"babel-watch server/index.js\" \"start chrome http://localhost:3000/\"",
-    "build": "vite build",
+    "build": "vite build && pnpm run server",
     "test": "TODO: storybook"
   },
   "dependencies": {
