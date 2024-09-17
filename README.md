@@ -6,20 +6,6 @@ Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
 pnpm run requirements
 ```
 
-## Cleanup
-The `requirements` script installs two global dependencies:
-
-- [`concurrently`](https://www.npmjs.com/package/concurrently)
-- [`babel-watch`](https://www.npmjs.com/package/babel-watch)
-
-Feel free to uninstall them once you're done.
-```bash
-npm uninstall -g babel-watch
-```
-```bash
-npm uninstall -g concurrently
-```
-
 ## Run
 
 ```bash
@@ -34,4 +20,18 @@ Google Chrome will pop up if you're using Windows. Otherwise, navigate to http:/
 pnpm build
 ```
 
-Deploy all contents under [`server`](server)
+You should then be able to deploy/containerize all contents under [`server`](server)
+
+## Cleanup
+The `requirements` script installs two global dependencies:
+
+- [`concurrently`](https://www.npmjs.com/package/concurrently)
+- [`babel-watch`](https://www.npmjs.com/package/babel-watch)
+
+Feel free to uninstall them once you're done.
+```bash
+npm uninstall -g babel-watch
+```
+```bash
+npm uninstall -g concurrently
+```

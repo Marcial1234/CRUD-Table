@@ -8,6 +8,7 @@ const __dirname = dirname(__filename)
 
 const app = express()
 
+app.use(express.static(join(__dirname, 'dist')))
 consign()
   .include('server/libs/middlewares.js')
   .then('server/routes')
@@ -15,5 +16,4 @@ consign()
   .into(app)
 
 // Deployment integration
-app.use('/assets', express.static(join(__dirname, 'dist/assets')))
-app.use('/*', (_, res) => res.sendFile(join(__dirname, 'dist/index.html')))
+app.use('/', (_, res) => res.sendFile(join(__dirname, 'dist/index.html')))
