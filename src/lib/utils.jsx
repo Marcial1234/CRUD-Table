@@ -15,7 +15,12 @@ export function cn(...inputs /* : ClassValue[] */) {
 // use dot.env for environment changes
 export const api = axios.create({
   // baseURL: `${window.location.protocol}//${window.location.host}/api`,
-  baseURL: `${window.location.protocol}//${window.location.hostname}:3000/api`,
+
+  baseURL: (() => {
+    if (window.location.port == 5173 /* vite's default port */)
+      return `${window.location.protocol}//${window.location.hostname}:3000/api`
+    return `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`
+  })(),
 })
 
 export const TYPE_ICONS = {

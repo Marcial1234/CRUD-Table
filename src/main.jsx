@@ -1,20 +1,29 @@
 import { DataTable, Skeleton } from '@/components/data-table'
 import '@/global.css'
 import Layout from '@/layouts/Layout.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    statetime: 10_000 /* 10 * seconds */,
+    queries: {},
+  },
+})
 
 const router = createBrowserRouter([
   {
     path: '*',
     element: (
-      // query provider...
-      // normal providers...
-      <Suspense fallback={<Skeleton />}>
-        <DataTable />
-        {/* <Skeleton /> */}
-      </Suspense>
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={<Skeleton />}>
+          <DataTable />
+        </Suspense>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     ),
   },
 ])
