@@ -1,4 +1,4 @@
-import DataTableDemo from '@/components/data-table/table'
+import { DataTable, Skeleton } from '@/components/data-table'
 import '@/global.css'
 import Layout from '@/layouts/Layout.jsx'
 import { StrictMode, Suspense } from 'react'
@@ -9,8 +9,10 @@ const router = createBrowserRouter([
   {
     path: '*',
     element: (
+      // query provider...
+      // normal providers...
       <Suspense fallback={<p>Loading...</p>}>
-        <DataTableDemo />
+        <Skeleton />
       </Suspense>
     ),
   },
