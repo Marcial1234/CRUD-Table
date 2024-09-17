@@ -22,13 +22,16 @@ const TooltipContent = forwardRef(({ className, sideOffset = 4, ...props }, ref)
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export default function ({ children, content }) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent>{content}</TooltipContent>
+const TooltipContainer = forwardRef(
+  ({ children, asChild = true, content, ...props }, ref) => (
+    <TooltipProvider ref={ref}>
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
+        <TooltipContent {...props}>{content}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  )
-}
+  ),
+)
+TooltipContainer.displayName = 'TooltipContainer'
+
+export default TooltipContainer

@@ -8,7 +8,7 @@
   {
     "id": "Th3ngERn9",
     "system_name": "MAC-LEADER",
-    "type": "MAC",
+    "type": "MACapple",
     "hdd_capacity": "2048"
   },
   {
@@ -26,13 +26,13 @@
   {
     "id": "Jj5bn3G2H",
     "system_name": "FIRST-MAC",
-    "type": "MAC",
+    "type": "MACapple",
     "hdd_capacity": "180"
   },
   {
     "id": "GT556QGnk",
     "system_name": "GOOD-MAC",
-    "type": "MAC",
+    "type": "MACapple",
     "hdd_capacity": "500"
   },
   {
@@ -62,7 +62,7 @@
   {
     "id": "Up5bcEQp4",
     "system_name": "JULIO-MAC-LOCAL",
-    "type": "MAC",
+    "type": "MACapple",
     "hdd_capacity": "512"
   },
   {
