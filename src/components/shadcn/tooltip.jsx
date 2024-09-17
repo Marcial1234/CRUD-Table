@@ -1,4 +1,4 @@
-/* Stipped TS version of https://ui.shadcn.com/docs/components/tooltip */
+/* https://ui.shadcn.com/docs/components/tooltip */
 import { cn } from '@/lib/utils'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { forwardRef } from 'react'

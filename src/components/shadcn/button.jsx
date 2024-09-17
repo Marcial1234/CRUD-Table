@@ -1,4 +1,4 @@
-/* Stipped TS version of https://ui.shadcn.com/docs/components/button */
+/* https://ui.shadcn.com/docs/components/button */
 import { cn } from '@/lib/utils'
 import { Slot } from '@radix-ui/react-slot'
 import {

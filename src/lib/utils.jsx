@@ -2,10 +2,13 @@ import WindowsIcon from '@/assets/Windows.svg?react'
 import AppleIcon from '@/assets/apple.svg?react'
 import LinuxIcon from '@/assets/linux.svg?react'
 import axios from 'axios'
-import { type ClassValue, clsx } from 'clsx'
+import {
+  /* type ClassValue, */
+  clsx,
+} from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs /* : ClassValue[] */) {
   return twMerge(clsx(inputs))
 }
 
