@@ -24,7 +24,7 @@ const TooltipContent = forwardRef(({ className, sideOffset = 4, ...props }, ref)
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 const TooltipContainer = forwardRef(
-  ({ children, asChild = true, content, ...props }, ref) => (
+  ({ children, content, asChild = true, ...props }, ref) => (
     <TooltipProvider>
       <Tooltip delayDuration={0} ref={ref}>
         <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>

@@ -27,11 +27,12 @@ export function getDevice(req, res) {
   const { id } = req.params
   const device = devices.find((d) => d.id === id)
 
-  // TODO verify synchronicity
-  if (!device) res.status(400).json({ error: 'ID not found' })
-
-  console.log(`Retrieving: ${JSON.stringify(device)}`)
-  res.json(device)
+  if (device) {
+    res.status(400).json({ error: 'ID not found' })
+  } else {
+    console.log(`Retrieving: ${JSON.stringify(device)}`)
+    res.json(device)
+  }
 }
 
 export function addDevice(req, res) {
@@ -42,22 +43,27 @@ export function addDevice(req, res) {
     type,
     hdd_capacity,
   }
-  devices.push(device)
+  devices = [device, ...devices]
   console.log(`Creating: ${JSON.stringify(device)}`)
   res.status(201).json(device)
 }
 
 export function updateDevice(req, res) {
   const { id } = req.params
-  const device = devices.find((d) => d.id === id)
+  const i = devices.findIndex((d) => d.id === id)
 
-  // TODO verify synchronicity
-  if (!device) res.status(404).json({ error: 'ID not found' })
-
-  const { system_name, type, hdd_capacity } = req.body
-  console.log(`Updating ${JSON.stringify(device)}`)
-  Object.assign(device, { system_name, type, hdd_capacity })
-  res.send(device)
+  if (i !== -1) {
+    const { system_name, type, hdd_capacity } = req.body
+    console.log(`Updating with ${JSON.stringify(req.body)}`)
+    devices[i] = Object.assign(devices[i], {
+      type,
+      system_name,
+      hdd_capacity: Number(hdd_capacity),
+    })
+    res.send(devices[i])
+  } else {
+    res.status(404).json({ error: 'ID not found' })
+  }
 }
 
 export function deleteDevice(req, res) {

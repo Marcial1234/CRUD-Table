@@ -4,15 +4,6 @@ import RefreshIcon from '@/assets/refresh.svg?react'
 import SearchIcon from '@/assets/search.svg?react'
 import Device from '@/components/device'
 import Button from '@/components/shadcn/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/shadcn/dialog'
 import Input from '@/components/shadcn/input'
 import {
   Table,
@@ -22,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import Toaster from '@/components/shadcn/toaster'
+// import Toaster from '@/components/shadcn/toaster'
 import Tooltip from '@/components/shadcn/tooltip'
 import { TYPE_ICONS } from '@/lib/utils'
 import {
@@ -33,17 +24,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import {
-  memo,
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-import { GenericDialog } from './crud-dialogs'
+import CrudDialog from './crud-dialogs'
 import ActionMenu from './crud-menu'
 import FilterMenu from './filter-menu'
 import SortMenu from './sort-menu'
@@ -80,38 +64,49 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 NoResults.displayName = 'NoResults'
 
 export default function DataTable({
-  data = dummy,
   setData,
   create,
   update,
   remove,
   reset,
+  data = dummy,
 }) {
   /**
    * Note: We can either call `.then(fetchAll)` after all CRUD actions ('server-driver'),
    *       or make *optimistic* changes in the UI.
    */
 
-  const properCreate = (device) =>
-    create(device).then((newDevice) => setData((d) => [newDevice, ...d]))
+  const properCreate = useCallback(
+    (device) =>
+      create(device).then((newDevice) => setData((d) => [newDevice, ...d])),
+    [create],
+  )
 
-  const propetUpdate = (updatedDevice) =>
-    update(updatedDevice).then((ud) =>
-      setData((d) => {
-        const i = d.findIndex(({ id: did }) => did == ud.id)
-        d.splice(i, 1)
-        return [ud, ...d]
-      }),
-    )
+  const properUpdate = useCallback(
+    (updatedDevice) =>
+      update(updatedDevice).then((ud) =>
+        setData((d) => {
+          const i = d.findIndex(({ id: did }) => did == ud.id)
+          console.log(d[i])
+          d[i] = Object.assign(d[i], ud)
+          console.log(d[i])
+          return [...d]
+        }),
+      ),
+    [update],
+  )
 
-  const properRemove = (id) =>
-    remove(id).then(() =>
-      setData((d) => {
-        const i = d.findIndex(({ id: did }) => did == id)
-        d.splice(i, 1)
-        return [...d]
-      }),
-    )
+  const properRemove = useCallback(
+    (id) =>
+      remove(id).then(() =>
+        setData((d) => {
+          const i = d.findIndex(({ id: did }) => did == id)
+          d.splice(i, 1)
+          return [...d]
+        }),
+      ),
+    [remove],
+  )
   /*****/
 
   /*** Fields for determining action column visiblity ***/
@@ -140,7 +135,7 @@ export default function DataTable({
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
 
-  const resetAllFilters = () => {
+  const resetAllFilters = useCallback(() => {
     setSorting([])
     setGlobalFilter('')
     setColumnFilters([])
@@ -148,13 +143,15 @@ export default function DataTable({
       if (qps.get('q')) qps.delete('q')
       return qps
     })
-  }
+  }, [])
 
-  const typeFilterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
-    label: 'type',
-    value: k,
-    icon: v,
-  }))
+  const typeFilterOptions = Object.freeze(
+    Object.entries(TYPE_ICONS).map(([k, v]) => ({
+      label: 'type',
+      value: k,
+      icon: v,
+    })),
+  )
 
   const HIDDEN_COLUMNS = Object.freeze({
     id: false,
@@ -190,13 +187,15 @@ export default function DataTable({
               close={() => setHoveredRow(null)}
               keepOpen={() => setPersistUDPopover(true)}
               openUpdateDialog={() => {
-                setUpdateDiagData(
-                  getValue('id'),
-                  getValue('name'),
-                  getValue('type'),
-                  getValue('capacity'),
+                if (
+                  !setUpdateDiagData([
+                    getValue('id'),
+                    getValue('name'),
+                    getValue('type'),
+                    getValue('capacity'),
+                  ])
                 )
-                setUpdateOpen(true)
+                  setUpdateOpen(true)
               }}
               openDeleteDialog={() => {
                 setDeleteDiagData([getValue('id'), getValue('name'), '', ''])
@@ -284,27 +283,28 @@ export default function DataTable({
 
   return (
     <>
-      {/* <DialogDemo /> */}
-      {/*
-      <CreateDialog
-        open={createOpen}
-        close={() => setCreateOpen(false)}
-        action={properCreate}
-      />
-      <UpdateDialog
-        open={updateOpen}
-        close={() => setUpdateOpen(false)}
-        action={propetUpdate}
-      />
-       */}
       {/* Dialogs */}
-      <GenericDialog
+      <CrudDialog
+        open={createOpen}
+        setOpen={setCreateOpen}
+        action={properCreate}
+        variant='create'
+      />
+      <CrudDialog
+        open={updateOpen}
+        setOpen={setUpdateOpen}
+        data={updateDiagData}
+        action={properUpdate}
+        variant='update'
+      />
+      <CrudDialog
         open={deleteOpen}
         setOpen={setDeleteOpen}
         data={deleteDiagData}
         action={properRemove}
         variant='remove'
       />
+      {/* Title + Creation */}
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
         Devices
         <Button
@@ -321,6 +321,7 @@ export default function DataTable({
             <SearchIcon className='absolute ml-3 h-3' />
             <Input
               autoFocus
+              autoComplete='on'
               id='gFilter'
               value={globalFilter ?? ''}
               className='pl-8'
@@ -407,8 +408,7 @@ export default function DataTable({
           )}
         </TableBody>
       </Table>
-      <Toaster />
+      {/* <Toaster /> */}
     </>
-    // toast time!!
   )
 }

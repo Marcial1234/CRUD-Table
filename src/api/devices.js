@@ -3,7 +3,13 @@ import { api } from '@/lib/utils'
 export const getAllDevices = () =>
   api
     .get(`/devices`)
-    .then(({ data }) => data)
+    .then(({ headers, data }) =>
+      headers['content-type'].includes(
+        'text/html' /* this means there's an API url/port/config error */,
+      )
+        ? []
+        : data,
+    )
     .catch((err) => {
       throw err
     })
@@ -25,9 +31,9 @@ export const createDevice = (newDevice) =>
       throw err
     })
 
-export const updateDevice = (id, device) =>
+export const updateDevice = (device) =>
   api
-    .put(`/devices/${id}`, device)
+    .put(`/devices/${device.get('id')}`, device)
     .then(({ data }) => data)
     .catch((err) => {
       throw err

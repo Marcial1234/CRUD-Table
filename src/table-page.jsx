@@ -18,13 +18,13 @@ export default function Page() {
     fetchAll()
   }, [])
 
-  const resetDevices = () => {
+  const resetDevices = useCallback(() => {
     setIsFetching(true)
     return api.resetDevices().then((data) => {
       setIsFetching(false)
       setData(data)
     })
-  }
+  }, [])
 
   return (
     <ErrorBoundary
@@ -38,6 +38,8 @@ export default function Page() {
         <DataTable
           data={data}
           setData={setData}
+          create={api.createDevice}
+          update={api.updateDevice}
           remove={api.deleteDevice}
           reset={resetDevices}
           // Commented out below if interested on 'server-driven' approach instead

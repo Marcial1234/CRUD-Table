@@ -1,5 +1,5 @@
 import FilterIcon from '@/assets/filter.svg?react'
-import { Badge } from '@/components/shadcn/badge'
+import Badge from '@/components/shadcn/badge'
 import Button from '@/components/shadcn/button'
 import {
   Command,
@@ -11,7 +11,7 @@ import {
   CommandSeparator,
 } from '@/components/shadcn/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
-import { Separator } from '@/components/shadcn/separator'
+import Separator from '@/components/shadcn/separator'
 import { capitalize, cn } from '@/lib/utils'
 import { CheckIcon } from '@radix-ui/react-icons'
 

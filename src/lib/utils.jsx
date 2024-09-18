@@ -12,12 +12,18 @@ export function cn(...inputs /* : ClassValue[] */) {
   return twMerge(clsx(inputs))
 }
 
+const API = 'api'
+const { hostname, port, protocol } = window.location
+
 export const api = axios.create({
   // Ideally this is passed from `.env` or other config variables
   baseURL: (() => {
-    if (window.location.port == 5173 /* vite's default port */)
-      return `${window.location.protocol}//${window.location.hostname}:3000/api`
-    return `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`
+    if (['4173', '5173'].includes(port) /* vite's default ports */) {
+      console.log('Using port 3000 for API')
+      return `${protocol}//${hostname}:3000/${API}`
+    }
+    console.log(`Using application port ${port} for API`)
+    return `${protocol}//${hostname}:${port}/${API}`
   })(),
   timeout: 1000,
 })

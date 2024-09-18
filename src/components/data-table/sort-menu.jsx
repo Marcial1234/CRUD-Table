@@ -1,7 +1,7 @@
 import Button from '@/components/shadcn/button'
 import Tooltip from '@/components/shadcn/tooltip'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function Menu({ title, toggle, sorting, id, disabled = false }) {
   const [sort, setSort] = useState(0)
@@ -14,15 +14,15 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
     }
   }, [disabled, sorting])
 
-  const liteDirectionEnumMap = {
+  const liteDirectionEnumMap = Object.freeze({
     0: 'Ascending',
     1: 'Descencing',
     2: 'Remove / reset sort',
-  }
-  const toggleSort = () => {
+  })
+  const toggleSort = useCallback(() => {
     toggle()
     setSort((d) => (d + 1) % 3)
-  }
+  }, [toggle])
 
   return (
     <Tooltip content={`Next sorting order: ${liteDirectionEnumMap[sort]}`}>

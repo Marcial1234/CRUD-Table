@@ -1,8 +1,10 @@
 import Tooltip from '@/components/shadcn/tooltip'
 import { TYPE_ICONS, calculateCapacity, capitalize } from '@/lib/utils'
 
-const expoOrLocale = (num) =>
-  num > 1e9 ? Number.parseFloat(num).toExponential(2) : num.toLocaleString()
+const expoOrCommaSeparated = (num) =>
+  num > 1e9
+    ? parseFloat(num).toExponential(2)
+    : parseInt(num).toLocaleString('en-US')
 
 export default function Device({ name, hdd, type }) {
   return (
@@ -11,7 +13,7 @@ export default function Device({ name, hdd, type }) {
       side='bottom'
       content={
         `Workstation '${name}' is a ${type} with ` +
-        `${expoOrLocale(hdd)}GB of capacity`
+        `${expoOrCommaSeparated(hdd)}GB of capacity`
       }
     >
       <div className='grid'>
