@@ -9,10 +9,26 @@ export function getAllDevices() {
     })
 }
 
+// Unused - it could be called inside the `UpdateDialog` but there was already implemented to pass in row data
+export function getDeviceById(id) {
+  return api
+    .get(`/device`, id)
+    .then(({ data }) => {
+      console.log(`inside devices.js ${data}`)
+      return data
+    })
+    .catch((err) => {
+      throw err
+    })
+}
+
 export function createDevice(newDevice) {
   return api
     .post(`/devices`, newDevice)
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      console.log(`inside devices.js ${data}`)
+      return data
+    })
     .catch((err) => {
       throw err
     })
@@ -20,17 +36,23 @@ export function createDevice(newDevice) {
 
 export function updateDevice(id, device) {
   return api
-    .put(`/devices/${id}`, device)
-    .then(({ data }) => data)
+    .put(`/device/${id}`, device)
+    .then(({ data }) => {
+      console.log(`inside devices.js ${data}`)
+      return data
+    })
     .catch((err) => {
       throw err
     })
 }
 
-export function deletePost(id) {
+export function deleteDevice(id) {
   return api
-    .put(`/devices/${id}`)
-    .then(({ data }) => data)
+    .delete(`/device/${id}`)
+    .then(({ data }) => {
+      console.log(`inside devices.js ${data}`)
+      return data
+    })
     .catch((err) => {
       throw err
     })

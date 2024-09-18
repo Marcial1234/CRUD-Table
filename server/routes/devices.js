@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 
 import {
   addDevice,
@@ -15,7 +15,7 @@ module.exports = (app) => {
     .post(addDevice)
 
   router.route('/devices/:id')
-    .get(getDevice)
+    .get(getDevice) /* not used */
     .put(updateDevice)
     .delete(deleteDevice)
 

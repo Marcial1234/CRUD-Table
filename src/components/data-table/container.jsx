@@ -24,15 +24,25 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import { GenericDialog } from './crud-dialogs'
 import ActionMenu from './crud-menu'
 import FilterMenu from './filter-menu'
 import SortMenu from './sort-menu'
 import { capacityAccessor } from './utils'
 
-const dummy = [
+// import { DeleteDialog } from './crud-dialogs';
+
+const dummy = Object.freeze([
   {
     id: 'm5gr84i9',
     system_name: "Nikoole's",
@@ -41,7 +51,7 @@ const dummy = [
   },
   {
     id: '3u1reuv4',
-    system_name: 'Foota',
+    system_name: 'DESKTOP-0VCBIFF',
     hdd_capacity: 1.247e24,
     type: 'linux',
   },
@@ -51,7 +61,7 @@ const dummy = [
     hdd_capacity: 1018,
     type: 'mac',
   },
-]
+])
 
 const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
   <TableRow>
@@ -62,18 +72,51 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 ))
 NoResults.displayName = 'NoResults'
 
-export default function DataTable({ data = dummy, reset }) {
+// {
+//   data: _data = dummy,
+//   reset,
+//   // create,
+//   // update,
+//   // remove /* `delete` is a reserved keyword */,
+// }
+
+export default function DataTable({ data: _data = dummy, reset = () => null }) {
+  // console.log(`reredering... ${_data.length}`)
+  /* Note: since the DB is not *actually* changing we need to do additional processing for changes to occus in the UI. */
+  const [data, setData] = useState(_data)
+
+  // const properCreate = (device) => {
+  //   // not sure on async await
+  //   const newDevice = create(device)
+  //   // setData((d) => [newDevice, ...d])
+  // }
+  // const propetUpdate = (updatedDevice) => {
+  //   update(updatedDevice)
+  //   // setData((d) => [updatedDevice, ...d])
+  // }
+  // const properRemove = useCallback((id) => {
+  //   console.log(id)
+  //   // setData((d) => {
+  //   //   const i = d.findIndex((row) => row.id == id)
+  //   //   d.splice(i, 1)
+  //   //   return d
+  //   // })
+  // }, [])
+  /*****/
+
+  /*** React/TanStack Query State ***/
+  const [sorting, setSorting] = useState([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
-  const [sorting, setSorting] = useState([])
 
   const resetAllFilters = () => {
     setSorting([])
     setColumnFilters([])
     setGlobalFilter('')
   }
+  /*****/
 
-  /* Two-way attachment of the `?q=[param]` as global filter input field */
+  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
   const [queryParams, setQueryParams] = useSearchParams()
   const deferredGlobalFilter = useDeferredValue(globalFilter)
   useEffect(() => {
@@ -92,9 +135,19 @@ export default function DataTable({ data = dummy, reset }) {
   }, [deferredGlobalFilter])
   /*****/
 
-  /*** Fields for determining action column visiblity ****/
+  /*** Fields for determining action column visiblity ***/
   const [hoveredRow, setHoveredRow] = useState('')
-  const [keepOpen, setKeepOpen] = useState(false)
+  const [persistUPPopover, setPersistUDPopover] = useState(false)
+  /*****/
+
+  /*** Modals/Dialogs open + information setters ***/
+  const [createOpen, setCreateOpen] = useState(false)
+  const [updateOpen, setUpdateOpen] = useState(
+    /* <boolean | [id, name, type, capacity]> */ false,
+  )
+  const [deleteOpen, setDeleteOpen] = useState(
+    /* <boolean | [id, name, string, string]> */ false,
+  )
   /*****/
 
   const filterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
@@ -103,12 +156,24 @@ export default function DataTable({ data = dummy, reset }) {
     icon: v,
   }))
 
-  const HIDDEN_COLUMNS = {
+  const HIDDEN_COLUMNS = Object.freeze({
     id: false,
+    name: false,
     type: false,
-    system_name: false,
-    hdd_capacity: false,
-  }
+    capacity: false,
+  })
+
+  const DeleteDialog = memo(({ deleteOpen }) => {
+    console.log('ello!')
+    return (
+      <GenericDialog
+        open={deleteOpen}
+        close={() => setDeleteOpen(false)}
+        action={console.log}
+        variant='remove'
+      />
+    )
+  })
 
   const columns = useMemo(
     () => [
@@ -129,13 +194,24 @@ export default function DataTable({ data = dummy, reset }) {
       },
       {
         id: 'actions',
-        cell: ({ row }) => (
-          <a onMouseLeave={() => setKeepOpen(false)}>
+        cell: ({ row: { id, getValue } }) => (
+          <a onMouseLeave={() => setPersistUDPopover(false)}>
             <ActionMenu
-              close={() => setHoveredRow(null)}
-              keepOpen={() => setKeepOpen(true)}
+              id={id}
               hoveredRow={hoveredRow}
-              id={row.id}
+              close={() => setHoveredRow(null)}
+              keepOpen={() => setPersistUDPopover(true)}
+              openUpdateDialog={() =>
+                setUpdateOpen(
+                  getValue('id'),
+                  getValue('name'),
+                  getValue('type'),
+                  getValue('capacity'),
+                )
+              }
+              openDeleteDialog={() =>
+                setDeleteOpen([getValue('id'), getValue('name'), '', ''])
+              }
             />
           </a>
         ),
@@ -146,21 +222,14 @@ export default function DataTable({ data = dummy, reset }) {
         accessorFn: ({ id }) => id,
       },
       {
-        id: 'system_name',
+        id: 'name',
         header: 'Name',
         accessorFn: ({ system_name }) => system_name,
       },
       {
-        id: 'hdd_capacity',
-        header: 'HDD Capacity',
-        accessorFn: ({ hdd_capacity }) => hdd_capacity,
-        filterFn: (row, colId, value) =>
-          capacityAccessor(row.getValue(colId)).includes(value),
-      },
-      {
         id: 'type',
         header: 'Operating System',
-        accessorFn: ({ type }) => (type == 'mac' ? 'macapple' : type),
+        accessorFn: ({ type }) => (type.toLowerCase() == 'mac' ? 'macapple' : type),
         filterFn: (row, id, value) =>
           Array.isArray(value)
             ? value.length == 0 || // this resets all filters when we de-select manually/thru-the-ui
@@ -168,6 +237,13 @@ export default function DataTable({ data = dummy, reset }) {
                 v.toLowerCase().includes(row.getValue(id).toLowerCase()),
               )
             : value.toLowerCase().includes(row.getValue(id).toLowerCase()),
+      },
+      {
+        id: 'capacity',
+        header: 'HDD Capacity',
+        accessorFn: ({ hdd_capacity }) => hdd_capacity,
+        filterFn: (row, colId, value) =>
+          capacityAccessor(row.getValue(colId)).includes(value),
       },
     ],
     [hoveredRow],
@@ -199,12 +275,32 @@ export default function DataTable({ data = dummy, reset }) {
 
   return (
     <>
-      <Toaster /> {/* Required to use `Toasts` */}
-      <div className='flex items-center justify-between pb-4 pt-[0.825rem] text-2xl font-medium'>
+      {/* <Toaster /> Required to use `Toasts` */}
+      {/*
+      <CreateDialog
+        open={createOpen}
+        close={() => setCreateOpen(false)}
+        action={properCreate}
+      />
+      <UpdateDialog
+        open={updateOpen}
+        close={() => setUpdateOpen(false)}
+        action={propetUpdate}
+      />
+       */}
+      {/* Dialogs */}
+      {persistUPPopover && persistUPPopover && (
+        <DeleteDialog
+          open={deleteOpen}
+          setOpen={setDeleteOpen}
+          action={console.log}
+        />
+      )}
+      <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
         Devices
         <Button
           className='bg-[#337AB7] hover:bg-[#0054AE]'
-          onClick={() => alert('tbd!')}
+          onClick={() => setCreateOpen(true)}
         >
           <PlusIcon /> &nbsp; Add device
         </Button>
@@ -284,7 +380,9 @@ export default function DataTable({ data = dummy, reset }) {
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody onMouseLeave={() => (keepOpen ? null : setHoveredRow(null))}>
+        <TableBody
+          onMouseLeave={() => (persistUPPopover ? null : setHoveredRow(null))}
+        >
           {!table.getRowModel().rows?.length ? (
             <NoResults colSpan={columns.length} />
           ) : (

@@ -28,7 +28,14 @@ import { MoreHorizontal } from 'lucide-react'
 //   return mutation.mutate()
 // }
 
-export default function Menu({ hoveredRow, keepOpen, close, id }) {
+export default function Menu({
+  id,
+  close,
+  keepOpen,
+  hoveredRow,
+  openUpdateDialog,
+  openDeleteDialog,
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild onMouseEnter={keepOpen}>
@@ -42,8 +49,16 @@ export default function Menu({ hoveredRow, keepOpen, close, id }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' onMouseLeave={close}>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem className='text-red-600'>Delete</DropdownMenuItem>
+        <DropdownMenuItem onClick={openUpdateDialog}>Edit </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            console.log('clicked')
+            openDeleteDialog()
+          }}
+          className='text-red-600'
+        >
+          Delete
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

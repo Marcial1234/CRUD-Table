@@ -19,7 +19,7 @@ export default function Menu({ title, toggle, tableSorting, id, disabled }) {
   const liteDirectionEnumMap = {
     0: 'Ascending',
     1: 'Descencing',
-    2: 'Reset table',
+    2: 'Remove filter',
   }
   const toggleSort = () => {
     toggle()

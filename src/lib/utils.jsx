@@ -19,16 +19,22 @@ export const api = axios.create({
       return `${window.location.protocol}//${window.location.hostname}:3000/api`
     return `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`
   })(),
+  timeout: 1000,
+  // onDownloadProgress: (progressEvent) => {
+  //   // Handle progress updates here
+  //   const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+  //   console.log(`Download progress: ${progress}%`)
+  // },
 })
 
-export const TYPE_ICONS = {
+export const TYPE_ICONS = Object.freeze({
   WINDOWS: <WindowsIcon />,
   LINUX: <LinuxIcon />,
   MAC: <AppleIcon />,
-}
+})
 
 // Hopely this doesn't need to be updated for 10+ years :)
-const CAPACITY_TIERS = {
+const CAPACITY_TIERS = Object.freeze({
   0: 'G',
   1: 'T',
   2: 'P',
@@ -37,7 +43,7 @@ const CAPACITY_TIERS = {
   5: 'Y',
   6: 'B',
   7: 'Ge',
-}
+})
 
 // For consistency's sake
 export const capitalize = (string) =>
