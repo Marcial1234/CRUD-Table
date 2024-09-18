@@ -24,7 +24,7 @@ function Skeleton({ title }) {
   )
 }
 
-export default function FacetedFilter({ column, title, options, disabled }) {
+export default function Menu({ column, title, options, disabled = false }) {
   if (disabled) return <Skeleton title={title} />
 
   const facets = column.getFacetedUniqueValues()
@@ -86,6 +86,7 @@ export default function FacetedFilter({ column, title, options, disabled }) {
                   onSelect={() => {
                     if (isSelected) selectedValues.delete(option.value)
                     else selectedValues.add(option.value)
+
                     const filters = selectedValues.length
                       ? undefined
                       : Array.from(selectedValues)

@@ -3,27 +3,25 @@ import Tooltip from '@/components/shadcn/tooltip'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export default function Menu({ title, toggle, tableSorting, id, disabled }) {
-  const [sort, setSorting] = useState(0)
+export default function Menu({ title, toggle, sorting, id, disabled = false }) {
+  const [sort, setSort] = useState(0)
 
   useEffect(() => {
     if (disabled) return
-    if (
-      !tableSorting.length ||
-      (tableSorting.length == 1 && tableSorting[0].id !== id)
-    ) {
-      setSorting(0)
+
+    if (!sorting.length || (sorting.length == 1 && sorting[0].id !== id)) {
+      setSort(0)
     }
-  })
+  }, [disabled, sorting])
 
   const liteDirectionEnumMap = {
     0: 'Ascending',
     1: 'Descencing',
-    2: 'Remove filter',
+    2: 'Remove / reset sort',
   }
   const toggleSort = () => {
     toggle()
-    setSorting((d) => (d + 1) % 3)
+    setSort((d) => (d + 1) % 3)
   }
 
   return (

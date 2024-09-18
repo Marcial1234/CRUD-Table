@@ -7,25 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/shadcn/dialog'
+import { memo } from 'react'
 
-// export function CreateDialog({ open, close, action }) {
-//   return <GenericDialog open={open} close={close} action={action} variant='update' />
-// }
-
-// export function UpdateDialog({ open, close, action }) {
-//   return <GenericDialog open={open} close={close} action={action} variant='update' />
-// }
-
-// export function DeleteDialog({ open, close, action }) {
-//   return <GenericDialog open={open} close={close} action={action} variant='remove' />
-// }
-
-export function GenericDialog({ open, close, action, variant }) {
-  console.log(open, variant)
-
+export const GenericDialog = memo(({ open, setOpen, data, action, variant }) => {
   /* Not an ideal pattern, but better than sending them individually */
   let [id, name, type, capacity] = []
-  if (open) [id, name, type, capacity] = open
+  if (open) [id, name, type, capacity] = data
 
   const variants = {
     create: {},
@@ -48,10 +35,7 @@ export function GenericDialog({ open, close, action, variant }) {
       close: (
         <DialogClose
           className='bg-red-600 text-white'
-          onClick={() => {
-            action(id)
-            close()
-          }}
+          onClick={() => action(id).then(setOpen(false))}
         >
           &nbsp;Delete&nbsp;
         </DialogClose>
@@ -60,17 +44,19 @@ export function GenericDialog({ open, close, action, variant }) {
   }
 
   return (
-    <Dialog open={open}>
-      <DialogContent /* close={close} */>
-        <DialogTitle>oink</DialogTitle>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogTitle>{variants['remove'].title}</DialogTitle>
         <DialogHeader>
-          <DialogDescription className='grid gap-2'>oink</DialogDescription>
+          <DialogDescription className='grid gap-2'>
+            {variants[variant].description}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose onClick={close}>Cancel</DialogClose>
-          oink
+          <DialogClose>Cancel</DialogClose>
+          {variants[variant].close}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
-}
+})

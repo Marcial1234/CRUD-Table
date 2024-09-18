@@ -26,7 +26,7 @@ export default function () {
         </Button>
       </div>
       {/* Table Options */}
-      <div className='flex flex-wrap justify-between gap-2 py-2'>
+      <div className='flex flex-row flex-nowrap items-center justify-between gap-2 py-2'>
         <div className='flex flex-wrap gap-3'>
           <div className='flex flex-col space-y-3'>
             <div className='flex w-80 animate-pulse items-center bg-muted text-transparent'>

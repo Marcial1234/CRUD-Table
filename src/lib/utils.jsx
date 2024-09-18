@@ -13,18 +13,13 @@ export function cn(...inputs /* : ClassValue[] */) {
 }
 
 export const api = axios.create({
-  // Ideally this is passed from .env or other config variables
+  // Ideally this is passed from `.env` or other config variables
   baseURL: (() => {
     if (window.location.port == 5173 /* vite's default port */)
       return `${window.location.protocol}//${window.location.hostname}:3000/api`
     return `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`
   })(),
   timeout: 1000,
-  // onDownloadProgress: (progressEvent) => {
-  //   // Handle progress updates here
-  //   const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-  //   console.log(`Download progress: ${progress}%`)
-  // },
 })
 
 export const TYPE_ICONS = Object.freeze({

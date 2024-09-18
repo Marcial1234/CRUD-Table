@@ -7,27 +7,6 @@ import {
 } from '@/components/shadcn/dropdown-menu'
 import { MoreHorizontal } from 'lucide-react'
 
-// import * as api from '@/api/devices'
-// import { useMutation } from '@tanstack/react-query'
-// const updateDevice = (post) => {
-//   const mutation = useMutation({
-//     mutationFn: api.updateDevice,
-//     // update ui
-//     // onSucess: () =>
-//     //   queryClient.revalidateQueries({ queryKey: ['getDeviceById', post.id] }),
-//   })
-//   return mutation.mutate(post)
-// }
-
-// const deleteDevice = (id) => {
-//   const mutation = useMutation({
-//     mutationFn: api.deleteDevice,
-//     // update ui
-
-//   })
-//   return mutation.mutate()
-// }
-
 export default function Menu({
   id,
   close,
@@ -50,13 +29,7 @@ export default function Menu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' onMouseLeave={close}>
         <DropdownMenuItem onClick={openUpdateDialog}>Edit </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            console.log('clicked')
-            openDeleteDialog()
-          }}
-          className='text-red-600'
-        >
+        <DropdownMenuItem onClick={openDeleteDialog} className='text-red-600'>
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

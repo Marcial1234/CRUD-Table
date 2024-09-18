@@ -4,6 +4,15 @@ import RefreshIcon from '@/assets/refresh.svg?react'
 import SearchIcon from '@/assets/search.svg?react'
 import Device from '@/components/device'
 import Button from '@/components/shadcn/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/shadcn/dialog'
 import Input from '@/components/shadcn/input'
 import {
   Table,
@@ -40,8 +49,6 @@ import FilterMenu from './filter-menu'
 import SortMenu from './sort-menu'
 import { capacityAccessor } from './utils'
 
-// import { DeleteDialog } from './crud-dialogs';
-
 const dummy = Object.freeze([
   {
     id: 'm5gr84i9',
@@ -72,67 +79,39 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 ))
 NoResults.displayName = 'NoResults'
 
-// {
-//   data: _data = dummy,
-//   reset,
-//   // create,
-//   // update,
-//   // remove /* `delete` is a reserved keyword */,
-// }
+export default function DataTable({
+  data = dummy,
+  setData,
+  create,
+  update,
+  remove,
+  reset,
+}) {
+  /**
+   * Note: We can either call `.then(fetchAll)` after all CRUD actions ('server-driver'),
+   *       or make *optimistic* changes in the UI.
+   */
 
-export default function DataTable({ data: _data = dummy, reset = () => null }) {
-  // console.log(`reredering... ${_data.length}`)
-  /* Note: since the DB is not *actually* changing we need to do additional processing for changes to occus in the UI. */
-  const [data, setData] = useState(_data)
+  const properCreate = (device) =>
+    create(device).then((newDevice) => setData((d) => [newDevice, ...d]))
 
-  // const properCreate = (device) => {
-  //   // not sure on async await
-  //   const newDevice = create(device)
-  //   // setData((d) => [newDevice, ...d])
-  // }
-  // const propetUpdate = (updatedDevice) => {
-  //   update(updatedDevice)
-  //   // setData((d) => [updatedDevice, ...d])
-  // }
-  // const properRemove = useCallback((id) => {
-  //   console.log(id)
-  //   // setData((d) => {
-  //   //   const i = d.findIndex((row) => row.id == id)
-  //   //   d.splice(i, 1)
-  //   //   return d
-  //   // })
-  // }, [])
-  /*****/
+  const propetUpdate = (updatedDevice) =>
+    update(updatedDevice).then((ud) =>
+      setData((d) => {
+        const i = d.findIndex(({ id: did }) => did == ud.id)
+        d.splice(i, 1)
+        return [ud, ...d]
+      }),
+    )
 
-  /*** React/TanStack Query State ***/
-  const [sorting, setSorting] = useState([])
-  const [globalFilter, setGlobalFilter] = useState('')
-  const [columnFilters, setColumnFilters] = useState([])
-
-  const resetAllFilters = () => {
-    setSorting([])
-    setColumnFilters([])
-    setGlobalFilter('')
-  }
-  /*****/
-
-  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
-  const [queryParams, setQueryParams] = useSearchParams()
-  const deferredGlobalFilter = useDeferredValue(globalFilter)
-  useEffect(() => {
-    if (queryParams.get('q')) setGlobalFilter(decodeURI(queryParams.get('q')))
-  }, [queryParams])
-  useEffect(() => {
-    if (deferredGlobalFilter !== '' && deferredGlobalFilter !== queryParams.get('q'))
-      setQueryParams({ q: encodeURI(globalFilter) })
-
-    if (deferredGlobalFilter == '') {
-      setQueryParams((qps) => {
-        qps.delete('q')
-        return qps
-      })
-    }
-  }, [deferredGlobalFilter])
+  const properRemove = (id) =>
+    remove(id).then(() =>
+      setData((d) => {
+        const i = d.findIndex(({ id: did }) => did == id)
+        d.splice(i, 1)
+        return [...d]
+      }),
+    )
   /*****/
 
   /*** Fields for determining action column visiblity ***/
@@ -142,15 +121,36 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
 
   /*** Modals/Dialogs open + information setters ***/
   const [createOpen, setCreateOpen] = useState(false)
+
   const [updateOpen, setUpdateOpen] = useState(
     /* <boolean | [id, name, type, capacity]> */ false,
   )
-  const [deleteOpen, setDeleteOpen] = useState(
+  const [updateDiagData, setUpdateDiagData] = useState(
+    /* <boolean | [id, name, type, capacity]> */ false,
+  )
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteDiagData, setDeleteDiagData] = useState(
     /* <boolean | [id, name, string, string]> */ false,
   )
   /*****/
 
-  const filterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
+  /*** React/TanStack Table fields ***/
+  const [sorting, setSorting] = useState([])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [columnFilters, setColumnFilters] = useState([])
+
+  const resetAllFilters = () => {
+    setSorting([])
+    setGlobalFilter('')
+    setColumnFilters([])
+    setQueryParams((qps) => {
+      if (qps.get('q')) qps.delete('q')
+      return qps
+    })
+  }
+
+  const typeFilterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
     label: 'type',
     value: k,
     icon: v,
@@ -161,18 +161,6 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
     name: false,
     type: false,
     capacity: false,
-  })
-
-  const DeleteDialog = memo(({ deleteOpen }) => {
-    console.log('ello!')
-    return (
-      <GenericDialog
-        open={deleteOpen}
-        close={() => setDeleteOpen(false)}
-        action={console.log}
-        variant='remove'
-      />
-    )
   })
 
   const columns = useMemo(
@@ -201,17 +189,19 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
               hoveredRow={hoveredRow}
               close={() => setHoveredRow(null)}
               keepOpen={() => setPersistUDPopover(true)}
-              openUpdateDialog={() =>
-                setUpdateOpen(
+              openUpdateDialog={() => {
+                setUpdateDiagData(
                   getValue('id'),
                   getValue('name'),
                   getValue('type'),
                   getValue('capacity'),
                 )
-              }
-              openDeleteDialog={() =>
-                setDeleteOpen([getValue('id'), getValue('name'), '', ''])
-              }
+                setUpdateOpen(true)
+              }}
+              openDeleteDialog={() => {
+                setDeleteDiagData([getValue('id'), getValue('name'), '', ''])
+                setDeleteOpen(true)
+              }}
             />
           </a>
         ),
@@ -272,10 +262,29 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
   const filtrableData = table
     .getAllColumns()
     .filter(({ columnDef: { header } }) => typeof header === typeof '')
+  /*****/
+
+  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
+  const [queryParams, setQueryParams] = useSearchParams()
+  useEffect(() => {
+    if (queryParams.get('q')) setGlobalFilter(decodeURI(queryParams.get('q')))
+  }, [queryParams])
+  useEffect(() => {
+    if (globalFilter !== '' && globalFilter !== queryParams.get('q'))
+      setQueryParams({ q: encodeURI(globalFilter) })
+
+    if (globalFilter == '') {
+      setQueryParams((qps) => {
+        qps.delete('q')
+        return qps
+      })
+    }
+  }, [globalFilter])
+  /*****/
 
   return (
     <>
-      {/* <Toaster /> Required to use `Toasts` */}
+      {/* <DialogDemo /> */}
       {/*
       <CreateDialog
         open={createOpen}
@@ -289,13 +298,13 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
       />
        */}
       {/* Dialogs */}
-      {persistUPPopover && persistUPPopover && (
-        <DeleteDialog
-          open={deleteOpen}
-          setOpen={setDeleteOpen}
-          action={console.log}
-        />
-      )}
+      <GenericDialog
+        open={deleteOpen}
+        setOpen={setDeleteOpen}
+        data={deleteDiagData}
+        action={properRemove}
+        variant='remove'
+      />
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
         Devices
         <Button
@@ -327,7 +336,7 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
                 key={i}
                 column={col}
                 title='Device Type'
-                options={filterOptions}
+                options={typeFilterOptions}
               />
             ))}
           {/* Sorting */}
@@ -337,7 +346,7 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
               key={col.columnDef.id}
               title={col.columnDef.header}
               toggle={col.toggleSorting}
-              tableSorting={sorting}
+              sorting={sorting}
             />
           ))}
           {sorting?.length || globalFilter?.length || columnFilters?.length ? (
@@ -352,10 +361,7 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
           <Button
             className='px-3'
             variant='ghost'
-            onClick={() => {
-              resetAllFilters()
-              reset()
-            }}
+            onClick={() => reset().then(resetAllFilters)}
           >
             <RefreshIcon />
           </Button>
@@ -365,18 +371,16 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
         <TableHeader>
           {table.getHeaderGroups().map(({ id, headers }) => (
             <TableRow className='hover:bg-transparent' key={id}>
-              {headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                )
-              })}
+              {headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
@@ -403,6 +407,7 @@ export default function DataTable({ data: _data = dummy, reset = () => null }) {
           )}
         </TableBody>
       </Table>
+      <Toaster />
     </>
     // toast time!!
   )
