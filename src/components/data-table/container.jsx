@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-// import Toaster from '@/components/shadcn/toaster'
+import Toaster from '@/components/shadcn/toaster'
 import Tooltip from '@/components/shadcn/tooltip'
 import { TYPE_ICONS } from '@/lib/utils'
 import {
@@ -64,7 +64,7 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 ))
 NoResults.displayName = 'NoResults'
 
-const typeFilterOptions = Object.freeze(
+const TYPE_FILTER_OPTIONS = Object.freeze(
   Object.entries(TYPE_ICONS).map(([k, v]) => ({
     label: 'type',
     value: k,
@@ -341,7 +341,7 @@ export default function DataTable({
                 key={col.id}
                 column={col}
                 title='Device Type'
-                options={typeFilterOptions}
+                options={TYPE_FILTER_OPTIONS}
               />
             ))}
           {/* Sorting */}
@@ -416,7 +416,7 @@ export default function DataTable({
           )}
         </TableBody>
       </Table>
-      {/* <Toaster /> */}
+      <Toaster />
     </>
   )
 }

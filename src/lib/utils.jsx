@@ -13,6 +13,7 @@ export function cn(...inputs /* : ClassValue[] */) {
 }
 
 const API = 'api'
+const SECONDS = 1000
 const { hostname, port, protocol } = window.location
 
 export const api = axios.create({
@@ -25,7 +26,7 @@ export const api = axios.create({
     console.log(`Using application port ${port} for API`)
     return `${protocol}//${hostname}:${port}/${API}`
   })(),
-  timeout: 1000,
+  timeout: 5 * SECONDS,
 })
 
 export const TYPE_ICONS = Object.freeze({
