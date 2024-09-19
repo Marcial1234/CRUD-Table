@@ -1,6 +1,6 @@
-import WindowsIcon from '@/assets/Windows.svg?react'
 import AppleIcon from '@/assets/apple.svg?react'
 import LinuxIcon from '@/assets/linux.svg?react'
+import WindowsIcon from '@/assets/windows.svg?react'
 import axios from 'axios'
 import {
   /* type ClassValue, */
@@ -34,7 +34,7 @@ export const TYPE_ICONS = Object.freeze({
   MAC: <AppleIcon />,
 })
 
-// Hopely these don't need to be updated for 10+ years :)
+// Hopefully these don't need to be updated for 10+ years :)
 const CAPACITY_TIERS = Object.freeze({
   0: 'G',
   1: 'T',
