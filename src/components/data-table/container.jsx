@@ -34,7 +34,7 @@ import FilterMenu from './filter-menu'
 import SortMenu from './sort-menu'
 import { capacityAccessor } from './utils'
 
-const dummy = Object.freeze([
+const DUMMY = Object.freeze([
   {
     id: 'm5gr84i9',
     system_name: "Nikoole's",
@@ -72,53 +72,9 @@ const TYPE_FILTER_OPTIONS = Object.freeze(
   })),
 )
 
-export default function DataTable({
-  setData,
-  create,
-  update,
-  remove,
-  reset,
-  data = dummy,
-}) {
-  /**
-   * Note: We can either call `.then(fetchAll)` after all CRUD actions ('server-driver'),
-   *       or make *optimistic* changes in the UI.
-   */
-
-  const properCreate = useCallback(
-    (device) =>
-      create(device).then((newDevice) => setData((d) => [newDevice, ...d])),
-    [create],
-  )
-
-  const properUpdate = useCallback(
-    (updatedDevice) =>
-      update(updatedDevice).then((ud) =>
-        setData((d) => {
-          const i = d.findIndex(({ id: did }) => did == ud.id)
-          console.log(d[i])
-          d[i] = Object.assign(d[i], ud)
-          console.log(d[i])
-          return [...d]
-        }),
-      ),
-    [update],
-  )
-
-  const properRemove = useCallback(
-    (id) =>
-      remove(id).then(() =>
-        setData((d) => {
-          const i = d.findIndex(({ id: did }) => did == id)
-          d.splice(i, 1)
-          return [...d]
-        }),
-      ),
-    [remove],
-  )
-  /*****/
-
-  /*** Fields for determining action column visiblity ***/
+export default function DataTable({ create, update, remove, reset, data = DUMMY }) {
+  /*** Fields for determining action column visibility ***/
+  // used fields: setHoveredRow persistUPPopover
   const [hoveredRow, setHoveredRow] = useState('')
   const [persistUPPopover, setPersistUDPopover] = useState(false)
   /*****/
@@ -139,13 +95,30 @@ export default function DataTable({
 
   /*** React/TanStack Table fields ***/
   const [sorting, setSorting] = useState([])
-  const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
+
+  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
+  const [allParams, setQueryParams] = useSearchParams()
+  const [globalFilter, setGlobalFilter] = useState(allParams.get('q') ?? [''])
+  useEffect(() => {
+    const g = globalFilter[0]
+    if (g === '' || !g) {
+      setQueryParams((qps) => {
+        qps.delete('q')
+        return qps
+      })
+    } else if (g && g !== decodeURI(allParams.get('q')))
+      setQueryParams((qps) => {
+        qps.set('q', encodeURI(g))
+        return qps
+      })
+  }, [globalFilter])
+  /*****/
 
   const resetAllFilters = useCallback(() => {
     setSorting([])
-    setGlobalFilter('')
     setColumnFilters([])
+    setGlobalFilter([''])
     setQueryParams((qps) => {
       if (qps.get('q')) qps.delete('q')
       return qps
@@ -185,6 +158,7 @@ export default function DataTable({
               hoveredRow={hoveredRow}
               close={() => setHoveredRow(null)}
               keepOpen={() => setPersistUDPopover(true)}
+              /* First set the dialog data so they don't flicker on open */
               openUpdateDialog={() => {
                 if (
                   !setUpdateDiagData([
@@ -196,9 +170,10 @@ export default function DataTable({
                 )
                   setUpdateOpen(true)
               }}
+              /* First set the dialog data so they don't flicker on open */
               openDeleteDialog={() => {
-                setDeleteDiagData([getValue('id'), getValue('name'), '', ''])
-                setDeleteOpen(true)
+                if (!setDeleteDiagData([getValue('id'), getValue('name'), '', '']))
+                  setDeleteOpen(true)
               }}
             />
           </a>
@@ -222,9 +197,9 @@ export default function DataTable({
           Array.isArray(value)
             ? value.length == 0 || // this resets all filters when we de-select manually/thru-the-ui
               value.some((v) =>
-                v.toLowerCase().includes(row.getValue(id).toLowerCase()),
+                row.getValue(id).toLowerCase().includes(v.toLowerCase()),
               )
-            : value.toLowerCase().includes(row.getValue(id).toLowerCase()),
+            : row.getValue(id).toLowerCase().includes(value.toLowerCase()),
       },
       {
         id: 'capacity',
@@ -267,45 +242,27 @@ export default function DataTable({
   )
   /*****/
 
-  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
-  const [queryParams, setQueryParams] = useSearchParams()
-  useEffect(() => {
-    if (queryParams.get('q')) setGlobalFilter(decodeURI(queryParams.get('q')))
-  }, [queryParams])
-  useEffect(() => {
-    if (globalFilter !== '' && globalFilter !== queryParams.get('q'))
-      setQueryParams({ q: encodeURI(globalFilter) })
-
-    if (globalFilter == '') {
-      setQueryParams((qps) => {
-        qps.delete('q')
-        return qps
-      })
-    }
-  }, [globalFilter])
-  /*****/
-
   return (
     <>
       {/* Dialogs */}
       <CrudDialog
         open={createOpen}
         setOpen={setCreateOpen}
-        action={properCreate}
+        action={create}
         variant='create'
       />
       <CrudDialog
         open={updateOpen}
         setOpen={setUpdateOpen}
         data={updateDiagData}
-        action={properUpdate}
+        action={update}
         variant='update'
       />
       <CrudDialog
         open={deleteOpen}
         setOpen={setDeleteOpen}
         data={deleteDiagData}
-        action={properRemove}
+        action={remove}
         variant='remove'
       />
       {/* Title + Creation */}
@@ -319,7 +276,7 @@ export default function DataTable({
         </Button>
       </div>
       {/* Table Options */}
-      <div className='flex flex-row flex-nowrap items-center justify-between gap-2 py-2'>
+      <div className='flex flex-row flex-nowrap items-end justify-between gap-2 py-2'>
         <div className='flex flex-wrap gap-3'>
           <div className='flex w-80 items-center'>
             <SearchIcon className='absolute ml-3 h-3' />
@@ -354,7 +311,7 @@ export default function DataTable({
               sorting={sorting}
             />
           ))}
-          {sorting?.length || globalFilter?.length || columnFilters?.length ? (
+          {sorting?.length || globalFilter[0] != '' || columnFilters?.length ? (
             <Button
               variant='ghost'
               className='hover:bg-secondary-hover-background'

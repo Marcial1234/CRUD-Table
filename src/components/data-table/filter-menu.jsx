@@ -74,61 +74,69 @@ export default function Menu({ column, title, options, disabled = false }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className='max-w-60' align='start'>
-        <Command className=' w-48 min-w-56 text-center'>
+        <Command
+          loop={true}
+          className=' w-48 min-w-56 text-center '
+          filter={(value, search) => {
+            if (value.toLowerCase().includes('clear')) return 0.5
+            if (value.toLowerCase().includes(search)) return 1
+            return 0
+          }}
+        >
           <CommandInput autoFocus placeholder={title} />
-          <CommandList className='pr-1'>
+          <CommandList>
             <CommandEmpty>No results found</CommandEmpty>
-            {options.map((option) => {
-              let isSelected = selectedValues.has(option.value)
-              return (
-                <CommandItem
-                  key={option.value}
-                  onSelect={() => {
-                    if (isSelected) selectedValues.delete(option.value)
-                    else selectedValues.add(option.value)
+            <CommandGroup>
+              {options.map((option) => {
+                let isSelected = selectedValues.has(option.value)
+                return (
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => {
+                      if (isSelected) selectedValues.delete(option.value)
+                      else selectedValues.add(option.value)
 
-                    const filters = selectedValues.length
-                      ? undefined
-                      : Array.from(selectedValues)
-                    column.setFilterValue(filters)
-                  }}
-                  className='ml-1 flex items-center gap-1'
-                >
-                  <div
-                    className={cn(
-                      'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground'
-                        : 'opacity-50 [&_svg]:invisible',
-                    )}
+                      const filters = selectedValues.length
+                        ? undefined
+                        : Array.from(selectedValues)
+                      column.setFilterValue(filters)
+                    }}
+                    className='mx-1 flex items-center gap-1'
                   >
-                    <CheckIcon className={cn('h-4 w-4')} />
-                  </div>
-                  <>
-                    <span className='mr-1'> {option.icon}</span>
-                    {capitalize(option.value)}
-                    {findClosetKey(option.value) && (
-                      <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
-                        {facets.get(findClosetKey(option.value))}
-                      </span>
-                    )}
-                  </>
-                </CommandItem>
-              )
-            })}
-            {selectedValues.size > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem /* this is searchable */
+                    <div
+                      className={cn(
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground'
+                          : 'opacity-50 [&_svg]:invisible',
+                      )}
+                    >
+                      <CheckIcon className={cn('h-4 w-4')} />
+                    </div>
+                    <>
+                      <span className='mr-1'> {option.icon}</span>
+                      {capitalize(option.value)}
+                      {findClosetKey(option.value) && (
+                        <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
+                          {facets.get(findClosetKey(option.value))}
+                        </span>
+                      )}
+                    </>
+                  </CommandItem>
+                )
+              })}
+              {selectedValues.size > 0 && (
+                <>
+                  <CommandSeparator className='mt-1' />
+                  <CommandItem
                     onSelect={() => column.setFilterValue(undefined)}
-                    className='justify-center text-center'
+                    className='mx-1 mt-1 justify-center text-center '
                   >
                     Clear filters
                   </CommandItem>
-                </CommandGroup>
-              </>
-            )}
+                </>
+              )}
+            </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>

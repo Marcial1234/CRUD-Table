@@ -7,22 +7,57 @@ export default function Page() {
   const [data, setData] = useState([])
   const [isFetching, setIsFetching] = useState(true)
 
-  const fetchAll = useCallback(() => {
-    setIsFetching(true)
+  /* Initial fetch / get-all */
+  useEffect(() => {
     api.getAllDevices().then((data) => {
       setData(data)
       setIsFetching(false)
     })
   }, [])
-  useEffect(() => {
-    fetchAll()
-  }, [])
 
-  const resetDevices = useCallback(() => {
+  /**
+   * Note: We can either call `.then(reset)` after all CRUD actions ('server-driver'),
+   *       or make *optimistic* changes in the UI.
+   *       Opting for the UI-driven approach
+   */
+  const create = useCallback(
+    (device) =>
+      api
+        .createDevice(device)
+        .then((newDevice) => setData((d) => [newDevice, ...d])),
+    [],
+  )
+
+  const update = useCallback(
+    (updatedDevice) =>
+      api.updateDevice(updatedDevice).then((ud) =>
+        setData((d) => {
+          const i = d.findIndex(({ id: did }) => did == ud.id)
+          d[i] = Object.assign(d[i], ud)
+          return [...d]
+        }),
+      ),
+    [],
+  )
+
+  const remove = useCallback(
+    (id) =>
+      api.deleteDevice(id).then(() =>
+        setData((d) => {
+          const i = d.findIndex(({ id: did }) => did == id)
+          d.splice(i, 1)
+          return [...d]
+        }),
+      ),
+    [],
+  )
+
+  const reset = useCallback(() => {
     setIsFetching(true)
-    return api.resetDevices().then((data) => {
+    return api.resetDevices().then((resetData) => {
+      setData(resetData)
       setIsFetching(false)
-      setData(data)
+      return resetData
     })
   }, [])
 
@@ -37,18 +72,17 @@ export default function Page() {
       ) : (
         <DataTable
           data={data}
-          setData={setData}
-          create={api.createDevice}
-          update={api.updateDevice}
-          remove={api.deleteDevice}
-          reset={resetDevices}
+          create={create}
+          update={update}
+          remove={remove}
+          reset={reset}
           // Commented out below if interested on 'server-driven' approach instead
           // Currently, we don't handle backend errors.
           //
-          // create={(device) => api.createDevice(device).then(fetchAll)}
-          // update={(device) => api.updateDevice(device).then(fetchAll)}
-          // remove={(id) => api.deleteDevice(id).then(fetchAll)}
-          // reset={(id) => api.resetDevices(id).then(fetchAll)}
+          // create={(device) => api.createDevice(device).then(reset)}
+          // update={(device) => api.updateDevice(device).then(reset)}
+          // remove={(id) => api.deleteDevice(id).then(reset)}
+          // reset={(id) => api.resetDevices(id)}
         />
       )}
     </ErrorBoundary>

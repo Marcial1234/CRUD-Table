@@ -40,9 +40,12 @@ export const updateDevice = (device) =>
     })
 
 export const deleteDevice = (id) =>
-  api.delete(`/devices/${id}`).catch((err) => {
-    throw err
-  })
+  api
+    .delete(`/devices/${id}`)
+    .then(({ data }) => data)
+    .catch((err) => {
+      throw err
+    })
 
 export const resetDevices = () =>
   api

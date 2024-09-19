@@ -3,8 +3,8 @@ import express from 'express'
 import {
   addDevice,
   deleteDevice,
+  getAllDevices,
   getDevice,
-  getDevices,
   resetDevices,
   updateDevice,
 } from '../controllers/devices'
@@ -13,7 +13,7 @@ module.exports = (app) => {
   const router = express.Router()
   router
     .route('/devices')
-    .get(getDevices)
+    .get(getAllDevices)
     .post(addDevice)
     .delete(resetDevices) /* Non-standard REST usage */
 

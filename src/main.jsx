@@ -1,5 +1,5 @@
 import '@/global.css'
-import Layout from '@/layouts/Layout.jsx'
+import Layout from '@/layouts/layout.jsx'
 import TablePage from '@/table-page'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

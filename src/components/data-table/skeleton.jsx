@@ -23,7 +23,7 @@ export default function Loader() {
         </Button>
       </div>
       {/* Table Options */}
-      <div className='flex flex-row flex-nowrap items-center justify-between gap-2 py-2'>
+      <div className='flex flex-row flex-nowrap items-end justify-between gap-2 py-2'>
         <div className='flex flex-wrap gap-3'>
           <div className='flex flex-col space-y-3'>
             <div className='flex w-80 animate-pulse items-center bg-muted text-transparent'>
@@ -46,7 +46,7 @@ export default function Loader() {
           <TableRow>
             {Array.from({ length: 4 }, (_, i) => (
               <TableHead key={i}>
-                {i === 0 ? <Skeleton className='h-4 w-[10rem]' /> : null}
+                {i === 0 ? <Skeleton className='h-4 w-40' /> : null}
               </TableHead>
             ))}
           </TableRow>
@@ -56,7 +56,7 @@ export default function Loader() {
             <TableRow key={j}>
               {Array.from({ length: 4 }, (_, i) => (
                 <TableCell key={i}>
-                  <Skeleton className='h-4 w-[10rem]' />
+                  <Skeleton className='h-4 w-40' />
                 </TableCell>
               ))}
             </TableRow>

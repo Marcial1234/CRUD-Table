@@ -2,13 +2,10 @@ import AppleIcon from '@/assets/apple.svg?react'
 import LinuxIcon from '@/assets/linux.svg?react'
 import WindowsIcon from '@/assets/windows.svg?react'
 import axios from 'axios'
-import {
-  /* type ClassValue, */
-  clsx,
-} from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-export function cn(...inputs /* : ClassValue[] */) {
+export function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
 
@@ -23,8 +20,12 @@ export const api = axios.create({
       console.log('Using port 3000 for API')
       return `${protocol}//${hostname}:3000/${API}`
     }
-    console.log(`Using application port ${port} for API`)
-    return `${protocol}//${hostname}:${port}/${API}`
+    if (port) {
+      console.log(`Using defined port ${port} for API`)
+      return `${protocol}//${hostname}:${port}/${API}`
+    }
+    console.log(`Using default application port for API`)
+    return `${protocol}//${hostname}/${API}`
   })(),
   timeout: 5 * SECONDS,
 })

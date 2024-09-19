@@ -1,9 +1,9 @@
 import shortid from 'shortid'
 
-import server_devices from '../devices.json'
+import SERVER_DEVICES from '../devices.json'
 
 /* Server State  */
-var devices = [...server_devices]
+var devices = [...SERVER_DEVICES]
 var first = true
 
 function wait(ms) {
@@ -15,7 +15,7 @@ function wait(ms) {
   return true
 }
 
-export function getDevices(_, res) {
+export function getAllDevices(_, res) {
   // Force wait sync the first time the server runs to show Skeleton  :)
   if (first && wait(750)) {
     first = false
@@ -55,11 +55,12 @@ export function updateDevice(req, res) {
   if (i !== -1) {
     const { system_name, type, hdd_capacity } = req.body
     console.log(`Updating with ${JSON.stringify(req.body)}`)
-    devices[i] = Object.assign(devices[i], {
+    devices[i] = {
       type,
       system_name,
+      id: devices[i].id,
       hdd_capacity: Number(hdd_capacity),
-    })
+    }
     res.send(devices[i])
   } else {
     res.status(404).json({ error: 'ID not found' })
@@ -82,8 +83,6 @@ export function deleteDevice(req, res) {
 
 export function resetDevices(_, res) {
   // Always wait sync to show Skeleton :)
-  if (wait(200)) {
-    devices = [...server_devices]
-    res.status(201).json(devices)
-  }
+  devices = [...SERVER_DEVICES]
+  if (wait(200)) res.json([...devices])
 }
