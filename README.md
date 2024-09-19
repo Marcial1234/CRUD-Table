@@ -2,6 +2,24 @@
 
 ## Dev
 
+### Quick Run
+
+Build application is available thru:
+
+If you have `babel-node`:
+
+```bash
+pnpm i ; babel-node server/index.js
+```
+
+Otherwise `babel-watch` or (insert your `nodemon` runner of choice):
+
+```bash
+pnpm i ; babel-node server/index.js
+```
+
+Then browse to [`http://localhost:3000`](http://localhost:3000)
+
 ### Installation
 
 Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
@@ -69,7 +87,7 @@ pnpm rm -g babel-watch concurrently
 
 The look and feel of the app should not be affected by device width. However, on slow connections the `Skeleton` animation will load longer.
 
-### Capacity Unit conversion
+### Capacity Units
 
 Capacity units get simplified to their nearest higher unit with two decimals above `1028GB` on the table. However, their raw values delimited by commas are still available once you hover over a row.
 
@@ -85,13 +103,13 @@ The first input field in the table options row searches for _anything_ within th
 
 The `q=[value]` query parameter is attached to the table's filter. It's removed when any of the filter two buttons are used. It persists on a hard reload / refresh.
 
-### Filter by type
+### Search type when filtering
 
 Filter dropdown has type search capabilities, and also shows faceted values (uniques rows post filters).
 
 ### Field specific sorting buttons
 
-Each of the devices 4 fields (`id`, `system_name`, `type`, `hdd_capacity`) can be sorted by individually thru its own button instead of a combined dropdown.
+There are 3 field that can be uniquely sorted: `system_name`, `type`, or `hdd_capacity`. Each has its own button instead of a combined dropdown sort.
 
 **Note**: Multi-sort was not implemented. When a new field's sort is toggled, the previous one is removed.
 

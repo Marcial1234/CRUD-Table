@@ -64,6 +64,14 @@ const NoResults = memo(({ colSpan /* 'colSpan' does not change */ }) => (
 ))
 NoResults.displayName = 'NoResults'
 
+const typeFilterOptions = Object.freeze(
+  Object.entries(TYPE_ICONS).map(([k, v]) => ({
+    label: 'type',
+    value: k,
+    icon: v,
+  })),
+)
+
 export default function DataTable({
   setData,
   create,
@@ -143,12 +151,6 @@ export default function DataTable({
       return qps
     })
   }, [])
-
-  const typeFilterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
-    label: 'type',
-    value: k,
-    icon: v,
-  }))
 
   const HIDDEN_COLUMNS = Object.freeze({
     id: false,
