@@ -4,7 +4,7 @@
 
 ### Quick Run
 
-Build application is available thru:
+Assuming you have [`pnpm` installed](https://pnpm.io/installation#using-a-standalone-script), the built application is included and available thru:
 
 If you have `babel-node`:
 
@@ -12,7 +12,7 @@ If you have `babel-node`:
 pnpm i ; babel-node server/index.js
 ```
 
-Otherwise `babel-watch` or (insert your `nodemon` runner of choice):
+Otherwise `babel-watch` (or your `nodemon` runner of choice):
 
 ```bash
 pnpm i ; babel-node server/index.js
@@ -28,7 +28,7 @@ Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
 pnpm run requirements
 ```
 
-> **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [`package.json`](./package.json) scripts to not set them as global and / or not used them.
+> **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [`package.json`](./package.json) scripts to not use them or set them as global.
 
 ### Run
 
