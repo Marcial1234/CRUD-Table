@@ -53,8 +53,10 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
               }}
             >
               <input name='id' value={id} type='hidden' />
-              <div>
-                System Name <span className='text-red-600'>*</span>&nbsp;
+              <div className='grid'>
+                <span className='mb-1'>
+                  System Name <span className='text-red-600'>*</span>&nbsp;
+                </span>
                 <Input
                   autoComplete='on'
                   defaultValue={name}
@@ -63,8 +65,10 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   required
                 />
               </div>
-              <div>
-                HDD Capacity (in GB) <span className='text-red-600'>*</span>&nbsp;
+              <div className='grid'>
+                <span className='mb-1'>
+                  HDD Capacity (in GB) <span className='text-red-600'>*</span>&nbsp;
+                </span>
                 {/* Note: validation for 'max' will show as "Please enter a number */}
                 <Input
                   autoComplete='on'
@@ -77,8 +81,10 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   type='number'
                 />
               </div>
-              <div>
-                Device Type <span className='text-red-600'>*</span>&nbsp;
+              <div className='grid'>
+                <span className='mb-1'>
+                  Device Type <span className='text-red-600'>*</span>&nbsp;
+                </span>
                 {/* needs to be suffix '' */}
                 <select
                   className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'

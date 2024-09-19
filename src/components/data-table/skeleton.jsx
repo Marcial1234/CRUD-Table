@@ -1,6 +1,3 @@
-import PlusIcon from '@/assets/plus.svg?react'
-import RefreshIcon from '@/assets/refresh.svg?react'
-import SearchIcon from '@/assets/search.svg?react'
 import Button from '@/components/shadcn/button'
 import Input from '@/components/shadcn/input'
 import Skeleton from '@/components/shadcn/skeleton'
@@ -16,7 +13,7 @@ import {
 import FilterMenu from './filter-menu'
 import SortMenu from './sort-menu'
 
-export default function () {
+export default function Loader() {
   return (
     <>
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
