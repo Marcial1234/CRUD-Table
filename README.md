@@ -10,7 +10,7 @@ Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
 pnpm run requirements
 ```
 
-> **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [package.json](./package.json) scripts to not use them.
+> **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [`package.json`](./package.json) scripts to not set them as global and / or not used them.
 
 ### Run
 
@@ -18,9 +18,9 @@ pnpm run requirements
 pnpm dev
 ```
 
-Google Chrome will pop up if you're using Windows. Otherwise, navigate to http://localhost:5173
+Google Chrome will pop up if you're using Windows. Otherwise, navigate to [`http://localhost:5173`](http://localhost:5173)
 
-> **Note**: If there are issues with absolute links, you can view the code by using the build resource as `pnpm run server`. If not on Windows, then navigate to http://localhost:3000 as custom port per `.env` variables was not configured.
+> **Note**: If there are issues with absolute links, you can view the code by using the build resource as `pnpm run server`. If not on Windows navigate to [`http://localhost:3000`](http://localhost:3000). Port is stable as `.env` variables were not configured.
 
 ### Build and Deploy
 
@@ -40,11 +40,7 @@ The `requirements` script installs two global dependencies:
 Feel free to uninstall them once you're done.
 
 ```bash
-npm uninstall -g babel-watch
-```
-
-```bash
-npm uninstall -g concurrently
+pnpm rm -g babel-watch concurrently
 ```
 
 ## Documentation
@@ -53,20 +49,25 @@ npm uninstall -g concurrently
 
 ```raw
 ─ src
-    ├─ api:
+    ├─ api: axios wrapper on server endpoints
     ├─ assets: Images
     ├─ components
     │   ├─ data-table
-    │   │  ├─ index: Named exports
-    │   │  ├─ table-page: Business
-    │   │  ├─ container: Named exports
-    │   │  └─ ... rest of components ...
+    │   │  ├─ container.jsx: Container component that orchestrates table UI
+    │   │  ├─ crud-dialogs.jsx: Presentational component for Dialogs/Popups/Modals
+    │   │  ├─ index.js: Named exports
+    │   │  └─ ... rest of the module's components ...
     │   └─ shadcn
     │      └─ ... Modified Radix + ShadCn components ...
     ├─ layouts
     ├─ lib
-    └─ ... rest of regular React files ...
+    ├─ table-page.jsx: Integrates API fetchers with UI loading state
+    └─ ... rest of React files ...
 ```
+
+### Responsiveness
+
+The look and feel of the app should not be affected by device width. However, on slow connections the `Skeleton` animation will load longer.
 
 ### Capacity Unit conversion
 
@@ -74,25 +75,46 @@ Capacity units get simplified to their nearest higher unit with two decimals abo
 
 Maintain the raw data allows for future unit changes and migrations.
 
-The max allowed by the UI due to  is `1.247 * 10<sup>24</sup> GB` as it becomes the first unit not that's *currently not globally defined*, `1028GeB => 1 "future unit name"`.
+The max allowed by the UI is: <pre>`1.247 * 10`<sup>`24`</sup>` GB`</pre> `1028GeB => 1 "future unit name"` as becomes the first unit that's _not currently defined_:
 
 ### Deep Search
 
-The first input field in the table options row searches for *anything* within the `devices` data. This includes *both* raw and simplified capacity units.
+The first input field in the table options row searches for _anything_ within the `devices` data. This includes _both_ raw and simplified capacity units. Also matches `apple` to Mac Workstations.
 
 ### Query / Search Parameters
 
-The `q=[value]` query parameter is attached to the table's filter
+The `q=[value]` query parameter is attached to the table's filter. It's removed when any of the filter two buttons are used. It persists on a hard reload / refresh.
+
+### Filter by type
+
+Filter dropdown has type search capabilities, and also shows faceted values (uniques rows post filters).
+
+### Field specific sorting buttons
+
+Each of the devices 4 fields (`id`, `system_name`, `type`, `hdd_capacity`) can be sorted by individually thru its own button instead of a combined dropdown.
+
+**Note**: Multi-sort was not implemented. When a new field's sort is toggled, the previous one is removed.
+
+### Tooltips
+
+Each row and filter button, and the reset table button will show useful content on hover.
 
 ## Known imperfections
 
-- The [imported components](/src/components/shadcn/) from [`shadcn`](https://ui.shadcn.com/) used on this project are a bit complex/voluminous for the task at hand. But they do look nice!
-- There are a few naming / text inconsistencies between the "CRUD" initials and the values and the UI:
+- TypeScript wasn't used/added
+- **Feature**: Server responses are purposely [slowed down on first render](./server/controllers/devices.js#L19) to show `Skeleton` animation
+
+- The [imported components](/src/components/shadcn/) from [`shadcn`](https://ui.shadcn.com/) used on this project are a bit complex/voluminous for the task at hand. But they do look nice! A few are in TypeScript
+- The endpoint `GET api/device/:id` is not used
+- The table options (filters + sorting) overflow into a new line if device is small
+- There are a few naming / text inconsistencies between `CRUD` named-expansions and text / variable-names:
   - `Add` in the UI means `Create`
   - `Edit` in the UI mean `Update`
-  - `Delete` in the UI used `remove` variable/prop names under the hood, as `delete` is a reserved keyword in JS. Camel case variables use `delete`: e.g. `deleteRestOfVariableName`
-  - There might be too many uses of `memo` and `useCallback`. The app was flickering a lot at some point when using React/TanStack Query. I ended up scraping the use of RQ
-- No other filter besides the deep-search/big-search-field is parametrized on the URL
+  - `Delete` in the UI uses `remove` as variable/prop names in the code, as `delete` is a reserved keyword in JS. Camel case variables however do start with `delete`.
+- There might be an overuse of `memo` and `useCallback`. The app was flickering too much when using React/TanStack Query. RQ usage was scraped but the memoization hooks stayed. Premature optimizations might also include usage of `Object.freeze`.
+- The styles in the `data-table/container` and `skeleton` will need to be kept in sync manually
 - After you click on each table-options sorting button, the tooltip that shows the `Next filter: ...` will disappear Per research fixing this seemed seemed beyond its UX value
 - The select dropdown for device types in dialogs/modals doesn't show the OS's icons like in the table options filter
+- No other filter besides the deep-search/big-search-field is parametrized on the URL
+- Exceptions are not caught/resolved, and `ErrorBoundary`'s fallback is not useful
 - Didn't implement a Dark Mode - although there's a [Chrome extension that automatically forces dark mode on most websites](https://chromewebstore.google.com/detail/dark-reader/eimadpbcbfnmbkopoojfekhnkhdbieeh?hl=en-US3)

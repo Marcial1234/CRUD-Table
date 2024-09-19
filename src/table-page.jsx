@@ -29,7 +29,7 @@ export default function Page() {
   return (
     <ErrorBoundary
       fallback={
-        <div className='py-4'>Something went wrong... That's all we know</div>
+        <div className='py-4'>Something went wrong... That&apos;s all we know</div>
       }
     >
       {isFetching ? (

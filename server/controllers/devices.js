@@ -81,7 +81,9 @@ export function deleteDevice(req, res) {
 }
 
 export function resetDevices(_, res) {
-  devices = [...server_devices]
   // Always wait sync to show Skeleton :)
-  if (wait(200)) res.status(201).json(server_devices)
+  if (wait(200)) {
+    devices = [...server_devices]
+    res.status(201).json(devices)
+  }
 }

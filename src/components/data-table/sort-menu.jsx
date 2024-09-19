@@ -12,7 +12,7 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
     if (!sorting.length || (sorting.length == 1 && sorting[0].id !== id)) {
       setSort(0)
     }
-  }, [disabled, sorting])
+  }, [id, disabled, sorting])
 
   const liteDirectionEnumMap = Object.freeze({
     0: 'Ascending',

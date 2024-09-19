@@ -19,6 +19,7 @@ import { TYPE_ICONS } from '@/lib/utils'
 import {
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
@@ -117,16 +118,14 @@ export default function DataTable({
   /*** Modals/Dialogs open + information setters ***/
   const [createOpen, setCreateOpen] = useState(false)
 
-  const [updateOpen, setUpdateOpen] = useState(
-    /* <boolean | [id, name, type, capacity]> */ false,
-  )
+  const [updateOpen, setUpdateOpen] = useState(false)
   const [updateDiagData, setUpdateDiagData] = useState(
     /* <boolean | [id, name, type, capacity]> */ false,
   )
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteDiagData, setDeleteDiagData] = useState(
-    /* <boolean | [id, name, string, string]> */ false,
+    /* <boolean | [id, name, '', '']> */ false,
   )
   /*****/
 
@@ -145,13 +144,11 @@ export default function DataTable({
     })
   }, [])
 
-  const typeFilterOptions = Object.freeze(
-    Object.entries(TYPE_ICONS).map(([k, v]) => ({
-      label: 'type',
-      value: k,
-      icon: v,
-    })),
-  )
+  const typeFilterOptions = Object.entries(TYPE_ICONS).map(([k, v]) => ({
+    label: 'type',
+    value: k,
+    icon: v,
+  }))
 
   const HIDDEN_COLUMNS = Object.freeze({
     id: false,
@@ -253,14 +250,19 @@ export default function DataTable({
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
   })
 
-  const filtrableData = table
-    .getAllColumns()
-    .filter(({ columnDef: { header } }) => typeof header === typeof '')
+  const filtrableData = useMemo(
+    () =>
+      table
+        .getAllColumns()
+        .filter(({ columnDef: { header } }) => typeof header === typeof ''),
+    [table],
+  )
   /*****/
 
   /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
@@ -332,9 +334,9 @@ export default function DataTable({
           {/* Filters */}
           {filtrableData
             .filter(({ columnDef: { id } }) => id === 'type')
-            .map((col, i) => (
+            .map((col) => (
               <FilterMenu
-                key={i}
+                key={col.id}
                 column={col}
                 title='Device Type'
                 options={typeFilterOptions}
@@ -351,7 +353,11 @@ export default function DataTable({
             />
           ))}
           {sorting?.length || globalFilter?.length || columnFilters?.length ? (
-            <Button variant='ghost' onClick={resetAllFilters}>
+            <Button
+              variant='ghost'
+              className='hover:bg-secondary-hover-background'
+              onClick={resetAllFilters}
+            >
               Reset All Filters
             </Button>
           ) : (
