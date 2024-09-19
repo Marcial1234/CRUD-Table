@@ -16,7 +16,7 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
 
   const liteDirectionEnumMap = Object.freeze({
     0: 'Ascending',
-    1: 'Descencing',
+    1: 'Descending',
     2: 'Remove / reset sort',
   })
   const toggleSort = useCallback(() => {

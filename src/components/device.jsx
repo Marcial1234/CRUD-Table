@@ -16,7 +16,7 @@ export default function Device({ name, hdd, type }) {
         `${expoOrCommaSeparated(hdd)}GB of capacity`
       }
     >
-      <div className='grid'>
+      <div className='grid cursor-default'>
         <div className='flex items-center gap-1'>
           {TYPE_ICONS[type?.toUpperCase()]} {name?.toUpperCase()}
         </div>

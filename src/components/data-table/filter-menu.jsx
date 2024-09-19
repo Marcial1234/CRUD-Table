@@ -120,7 +120,7 @@ export default function Menu({ column, title, options, disabled = false }) {
               <>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
+                  <CommandItem /* this is searchable */
                     onSelect={() => column.setFilterValue(undefined)}
                     className='justify-center text-center'
                   >

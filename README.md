@@ -15,7 +15,7 @@ pnpm i ; babel-node server/index.js
 Otherwise `babel-watch` (or your `nodemon` runner of choice):
 
 ```bash
-pnpm i ; babel-node server/index.js
+pnpm i ; babel-watch server/index.js
 ```
 
 Then browse to [`http://localhost:3000`](http://localhost:3000)
@@ -123,14 +123,14 @@ Each row and filter button, and the reset table button will show useful content 
 - **Feature**: Server responses are purposely [slowed down on first render](./server/controllers/devices.js#L19) to show `Skeleton` animation
 
 - The [imported components](/src/components/shadcn/) from [`shadcn`](https://ui.shadcn.com/) used on this project are a bit complex/voluminous for the task at hand. But they do look nice! A few are in TypeScript
-- The endpoint `GET api/device/:id` is not used
+- The endpoint `GET api/devices/:id` is not used
 - The table options (filters + sorting) overflow into a new line if device is small
 - There are a few naming / text inconsistencies between `CRUD` named-expansions and text / variable-names:
   - `Add` in the UI means `Create`
   - `Edit` in the UI mean `Update`
   - `Delete` in the UI uses `remove` as variable/prop names in the code, as `delete` is a reserved keyword in JS. Camel case variables however do start with `delete`.
 - There might be an overuse of `memo` and `useCallback`. The app was flickering too much when using React/TanStack Query. RQ usage was scraped but the memoization hooks stayed. Premature optimizations might also include usage of `Object.freeze`.
-- The styles in the `data-table/container` and `skeleton` will need to be kept in sync manually
+- The styles in all `skeleton` components will need to be kept in sync manually
 - After you click on each table-options sorting button, the tooltip that shows the `Next filter: ...` will disappear Per research fixing this seemed seemed beyond its UX value
 - The select dropdown for device types in dialogs/modals doesn't show the OS's icons like in the table options filter
 - No other filter besides the deep-search/big-search-field is parametrized on the URL
