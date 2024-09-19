@@ -4,18 +4,10 @@
 
 ### Quick Run
 
-Assuming you have [`pnpm` installed](https://pnpm.io/installation#using-a-standalone-script), the built application is included and available thru:
-
-If you have `babel-node`:
+Using either `npm` or `pnpm` ([if installed](https://pnpm.io/installation#using-a-standalone-script)), you can run the server directly as built frontend application is included and available thru:
 
 ```bash
-pnpm i ; babel-node server/index.js
-```
-
-Otherwise `babel-watch` (or your `nodemon` runner of choice):
-
-```bash
-pnpm i ; babel-watch server/index.js
+[p]npm i ; babel-node server/index.js
 ```
 
 Then browse to [`http://localhost:3000`](http://localhost:3000)
@@ -25,7 +17,7 @@ Then browse to [`http://localhost:3000`](http://localhost:3000)
 Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
 
 ```bash
-pnpm run requirements
+[p]npm run requirements
 ```
 
 > **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [`package.json`](./package.json) scripts to not use them or set them as global.
@@ -33,32 +25,31 @@ pnpm run requirements
 ### Run
 
 ```bash
-pnpm dev
+[p]npm dev
 ```
 
 Google Chrome will pop up if you're using Windows. Otherwise, navigate to [`http://localhost:5173`](http://localhost:5173)
 
-> **Note**: If there are issues with absolute links, you can view the code by using the build resource as `pnpm run server`. If not on Windows navigate to [`http://localhost:3000`](http://localhost:3000). Port is stable as `.env` variables were not configured.
+> **Note**: If there are issues with absolute links, you can view the code by using the build resource as `[p]npm run server`. If not on Windows navigate to [`http://localhost:3000`](http://localhost:3000). Port is stable as `.env` variables were not configured.
 
 ### Build and Deploy
 
 ```bash
-pnpm build
+[p]npm build
 ```
 
 You should then be able to deploy/containerize all contents under [`server`](server)
 
 ### Cleanup
 
-The `requirements` script installs two global dependencies:
+The `requirements` script installs a global dependencies:
 
 - [`concurrently`](https://www.npmjs.com/package/concurrently)
-- [`babel-watch`](https://www.npmjs.com/package/babel-watch)
 
-Feel free to uninstall them once you're done.
+Feel free to uninstall it once you're done.
 
 ```bash
-pnpm rm -g babel-watch concurrently
+[p]npm rm -g babel-watch concurrently
 ```
 
 ## Documentation
