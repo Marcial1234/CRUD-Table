@@ -34,7 +34,7 @@ export const TYPE_ICONS = Object.freeze({
   MAC: <AppleIcon />,
 })
 
-// Hopely this doesn't need to be updated for 10+ years :)
+// Hopely these don't need to be updated for 10+ years :)
 const CAPACITY_TIERS = Object.freeze({
   0: 'G',
   1: 'T',

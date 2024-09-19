@@ -33,7 +33,7 @@ export const createDevice = (newDevice) =>
 
 export const updateDevice = (device) =>
   api
-    .put(`/devices/${device.get('id')}`, device)
+    .put(`/devices/${device.id}`, device)
     .then(({ data }) => data)
     .catch((err) => {
       throw err

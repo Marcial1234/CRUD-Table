@@ -20,7 +20,7 @@ export default function Device({ name, hdd, type }) {
         <div className='flex items-center gap-1'>
           {TYPE_ICONS[type?.toUpperCase()]} {name?.toUpperCase()}
         </div>
-        <span className='text-sm font-normal text-muted-foreground'>
+        <span className='text-left text-sm font-normal text-muted-foreground'>
           {`${capitalize(type?.toUpperCase())} Workstation - ` +
             `${calculateCapacity(Number(hdd))}`}
         </span>

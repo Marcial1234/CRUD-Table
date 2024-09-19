@@ -58,7 +58,7 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 <Input
                   autoComplete='on'
                   defaultValue={name}
-                  maxLength={58} // the length where the table starts to overflow at 50% on my screen
+                  maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrappable characters (i.e ' ', '-', etc)
                   name='system_name'
                   required
                 />
