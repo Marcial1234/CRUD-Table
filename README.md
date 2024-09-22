@@ -1,56 +1,32 @@
-# React Showcase
+# NinjaOne React Dev Showcase
 
 ## Dev
 
 ### Quick Run
 
-Using either `npm` or `pnpm` ([if installed](https://pnpm.io/installation#using-a-standalone-script)), you can run the server directly as built frontend application is included and available thru:
+Using `npm` (or your package-manager of choice - such as [`pnpm`](https://pnpm.io/installation#using-a-standalone-script)), you can run the server directly as built frontend application is included and available thru:
 
 ```bash
-[p]npm i ; babel-node server/index.js
+npm i ; babel-node server/index.js
 ```
 
 Then browse to [`http://localhost:3000`](http://localhost:3000)
 
-### Installation
-
-Install [`pnpm`](https://pnpm.io/installation#using-a-standalone-script), then:
-
-```bash
-[p]npm run requirements
-```
-
-> **Note**: [This script installs two global dependencies](./package.json#L7). Feel free to change [`package.json`](./package.json) scripts to not use them or set them as global.
-
 ### Run
 
 ```bash
-[p]npm dev
+npm run dev
 ```
 
 Google Chrome will pop up if you're using Windows. Otherwise, navigate to [`http://localhost:5173`](http://localhost:5173)
 
-> **Note**: If there are issues with absolute links, you can view the code by using the build resource as `[p]npm run server`. If not on Windows navigate to [`http://localhost:3000`](http://localhost:3000). Port is stable as `.env` variables were not configured.
-
-### Build and Deploy
+### Build
 
 ```bash
-[p]npm build
+npm run build
 ```
 
 You should then be able to deploy/containerize all contents under [`server`](server)
-
-### Cleanup
-
-The `requirements` script installs a global dependencies:
-
-- [`concurrently`](https://www.npmjs.com/package/concurrently)
-
-Feel free to uninstall it once you're done.
-
-```bash
-[p]npm rm -g babel-watch concurrently
-```
 
 ## Documentation
 
@@ -82,31 +58,30 @@ The look and feel of the app should not be affected by device width. However, on
 
 Capacity units get simplified to their nearest higher unit with two decimals above `1028GB` on the table. However, their raw values delimited by commas are still available once you hover over a row.
 
-Maintain the raw data allows for future unit changes and migrations.
-
-The max allowed by the UI is: <pre>`1.247 * 10`<sup>`24`</sup>` GB`</pre> `1028GeB => 1 "future unit name"` as becomes the first unit that's _not currently defined_:
+Maintaining the raw data allows for future unit changes and migrations.
+The max allowed by the UI is: <pre>`1.247 * 10`<sup>`24`</sup>` GB`</pre> which is roughtly equivalent to `1028GeB` (1028 Geopbytes <sup>[[1]](https://en.wiktionary.org/wiki/geopbyte)[[2]](https://itlaw.fandom.com/wiki/Geopbyte)</sup>), which is the next unite of storage. The next unit was not included as its naming is not settled as of yet, and what was was included should be enough for the 2020s-2030s data needs.
 
 ### Deep Search
 
-The first input field in the table options row searches for _anything_ within the `devices` data. This includes _both_ raw and simplified capacity units. Also matches `apple` to Mac Workstations.
+The first input field in the table options row searches for _anything_ within the `devices` data, **and includes _both_** raw and simplified capacity units. Also matches `apple` to Mac Workstations.
 
 ### Query / Search Parameters
 
 The `q=[value]` query parameter is attached to the table's filter. It's removed when any of the filter two buttons are used. It persists on a hard reload / refresh.
 
-### Search type when filtering
+### Type filtering
 
-Filter dropdown has type search capabilities, and also shows faceted values (uniques rows post filters).
+The filter dropdown has search capabilities for the workstation types, and also shows faceted (uniques post filters) values.
 
-### Field specific sorting buttons
+### Field-specific sorting buttons
 
-There are 3 field that can be uniquely sorted: `system_name`, `type`, or `hdd_capacity`. Each has its own button instead of a combined dropdown sort.
+The main 3 fields (`system_name`, `type`, and `hdd_capacity`) within `devices.json` can be uniquely sorted. Each has its own button instead of a combined dropdown sort.
 
 **Note**: Multi-sort was not implemented. When a new field's sort is toggled, the previous one is removed.
 
 ### Tooltips
 
-Each row and filter button, and the reset table button will show useful content on hover.
+Each row, filter and sorting button, and the reset button will show useful content on hover.
 
 ## Known imperfections
 
@@ -123,7 +98,8 @@ Each row and filter button, and the reset table button will show useful content 
 - There might be an overuse of `memo` and `useCallback`. The app was flickering too much when using React/TanStack Query. RQ usage was scraped but the memoization hooks stayed. Premature optimizations might also include usage of `Object.freeze`.
 - The styles in all `skeleton` components will need to be kept in sync manually
 - After you click on each table-options sorting button, the tooltip that shows the `Next filter: ...` will disappear Per research fixing this seemed seemed beyond its UX value
-- The select dropdown for device types in dialogs/modals doesn't show the OS's icons like in the table options filter
+- The select dropdown for device types in dialogs/modals doesn't show the OS's icons like in the table options filter. This was one of the last components done, so it was left on the simplest acceptable form
 - No other filter besides the deep-search/big-search-field is parametrized on the URL
 - Exceptions are not caught/resolved, and `ErrorBoundary`'s fallback is not useful
 - Didn't implement a Dark Mode - although there's a [Chrome extension that automatically forces dark mode on most websites](https://chromewebstore.google.com/detail/dark-reader/eimadpbcbfnmbkopoojfekhnkhdbieeh?hl=en-US3)
+- Environment variables (`PORT`, etc) support was not implemented
