@@ -9,6 +9,7 @@ import {
 import Input from '@/components/shadcn/input'
 import { TYPE_ICONS, capitalize } from '@/lib/utils'
 import { memo } from 'react'
+import { toast } from 'sonner'
 
 export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
   /* Not an ideal pattern, but shorter than sending them individually */
@@ -49,7 +50,14 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 for (let [k, v] of new FormData(e.target).entries()) {
                   formData[k] = v
                 }
-                action(formData).then(setOpen(false))
+                action(formData).then((data) => {
+                  toast.success(
+                    `${formData['system_name']} was successfully ${
+                      variant === 'create' ? 'created' : 'updated'
+                    }`,
+                  )
+                  setOpen(false)
+                })
               }}
             >
               <input name='id' value={id} type='hidden' />
@@ -62,7 +70,6 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   defaultValue={name}
                   maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrappable characters (i.e ' ', '-', etc)
                   name='system_name'
-                  required
                 />
               </div>
               <div className='grid'>
@@ -73,10 +80,11 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 <Input
                   autoComplete='on'
                   defaultValue={capacity ? Number(capacity) : ''}
+                  /*
                   max={1.247e24} // documented elsewhere: value that becomes higher than 1024 GeB
                   min={1}
+                  */
                   name='hdd_capacity'
-                  required
                   step={1}
                   type='number'
                 />
@@ -85,7 +93,6 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 <span className='mb-1'>
                   Device Type <span className='text-red-600'>*</span>&nbsp;
                 </span>
-                {/* needs to be suffix '' */}
                 <select
                   className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                   defaultValue={type ?? ''}
@@ -129,7 +136,10 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
             onClick={(e) => {
               e.preventDefault()
               if (variant.toLowerCase() === 'remove')
-                return action(id).then(setOpen(false))
+                return action(id).then(() => {
+                  toast.warning(`${name} was successfully deleted`)
+                  setOpen(false)
+                })
 
               const form = document.getElementById('crud-form')
               if (form.reportValidity()) form.requestSubmit()

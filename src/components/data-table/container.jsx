@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import Toaster from '@/components/shadcn/toaster'
 import Tooltip from '@/components/shadcn/tooltip'
 import { TYPE_ICONS } from '@/lib/utils'
 import {
@@ -27,6 +26,7 @@ import {
 } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Toaster } from 'sonner'
 
 import CrudDialog from './crud-dialogs'
 import ActionMenu from './crud-menu'
@@ -373,7 +373,7 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
           )}
         </TableBody>
       </Table>
-      <Toaster />
+      <Toaster position='bottom-center' closeButton />
     </>
   )
 }
