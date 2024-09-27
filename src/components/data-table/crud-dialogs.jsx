@@ -15,6 +15,7 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
   /* Not an ideal pattern, but shorter than sending them individually */
   let [id, name, type, capacity] = ['', '', '', '']
   if (open && data) [id, name, type, capacity] = data
+  const lowerCaseVariant = variant.toLowerCase()
 
   const variants = Object.freeze({
     create: {
@@ -39,25 +40,29 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
           {variant} dialog {/* `description` element avoids an a11y warning */}
         </DialogDescription>
         <div className='flex flex-col space-y-1.5 text-left text-sm text-muted-foreground'>
-          {variant.toLowerCase() !== 'remove' ? (
+          {lowerCaseVariant !== 'remove' ? (
             <form
               id='crud-form'
               className='grid gap-4'
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault()
 
                 const formData = {}
                 for (let [k, v] of new FormData(e.target).entries()) {
                   formData[k] = v
                 }
-                action(formData).then((data) => {
+
+                await action(formData)
+                if (lowerCaseVariant === 'create')
                   toast.success(
-                    `${formData['system_name']} was successfully ${
-                      variant === 'create' ? 'created' : 'updated'
-                    }`,
+                    `Device "${formData['system_name']}" was successfully created`,
                   )
-                  setOpen(false)
-                })
+                else
+                  toast.info(
+                    /* All other fields BUT ID can change */
+                    `Device with ID "${id}" was successfully updated`,
+                  )
+                setOpen(false)
               }}
             >
               <input name='id' value={id} type='hidden' />
@@ -70,6 +75,7 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   defaultValue={name}
                   maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrappable characters (i.e ' ', '-', etc)
                   name='system_name'
+                  // TODO: controlled validation
                 />
               </div>
               <div className='grid'>
@@ -81,7 +87,7 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   autoComplete='on'
                   defaultValue={capacity ? Number(capacity) : ''}
                   /*
-                  max={1.247e24} // documented elsewhere: value that becomes higher than 1024 GeB
+                  max={1.208e24} // documented elsewhere: value that becomes higher than 1024 GeB
                   min={1}
                   */
                   name='hdd_capacity'
@@ -129,23 +135,24 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
           <DialogClose>Cancel</DialogClose>
           <DialogClose
             className={`text-white ${
-              variant.toLowerCase() == 'remove'
+              lowerCaseVariant == 'remove'
                 ? 'bg-red-600 hover:bg-red-700'
                 : 'bg-[#337AB7]  hover:bg-[#0054AE]'
             }`}
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
-              if (variant.toLowerCase() === 'remove')
-                return action(id).then(() => {
-                  toast.warning(`${name} was successfully deleted`)
-                  setOpen(false)
-                })
 
-              const form = document.getElementById('crud-form')
-              if (form.reportValidity()) form.requestSubmit()
+              if (lowerCaseVariant === 'remove') {
+                await action(id)
+                toast.warning(`Device "${name}" was successfully deleted`)
+                setOpen(false)
+              } else {
+                const form = document.getElementById('crud-form')
+                if (form.reportValidity()) form.requestSubmit()
+              }
             }}
           >
-            {variants[variant].actionText}
+            {variants[lowerCaseVariant].actionText}
           </DialogClose>
         </DialogFooter>
       </DialogContent>

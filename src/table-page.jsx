@@ -8,11 +8,13 @@ export default function Page() {
   const [isFetching, setIsFetching] = useState(true)
 
   /* Initial fetch / get-all */
+  const getAllDevices = async () => {
+    const data = await api.getAllDevices()
+    setData(data)
+    setIsFetching(false)
+  }
   useEffect(() => {
-    api.getAllDevices().then((data) => {
-      setData(data)
-      setIsFetching(false)
-    })
+    getAllDevices()
   }, [])
 
   /**
@@ -20,45 +22,30 @@ export default function Page() {
    *       or make *optimistic* changes in the UI.
    *       Opting for the UI-driven approach
    */
-  const create = useCallback(
-    (device) =>
-      api
-        .createDevice(device)
-        .then((newDevice) => setData((d) => [newDevice, ...d])),
-    [],
-  )
+  const create = useCallback(async (device) => {
+    const newDevice = await api.createDevice(device)
+    setData((d) => [newDevice, ...d])
+  }, [])
 
-  const update = useCallback(
-    (updatedDevice) =>
-      api.updateDevice(updatedDevice).then((ud) =>
-        setData((d) => {
-          const i = d.findIndex(({ id: did }) => did == ud.id)
-          d[i] = Object.assign(d[i], ud)
-          return [...d]
-        }),
-      ),
-    [],
-  )
+  const update = useCallback(async (updatedDevice) => {
+    const serverDevice = await api.updateDevice(updatedDevice)
 
-  const remove = useCallback(
-    (id) =>
-      api.deleteDevice(id).then(() =>
-        setData((d) => {
-          const i = d.findIndex(({ id: did }) => did == id)
-          d.splice(i, 1)
-          return [...d]
-        }),
-      ),
-    [],
-  )
+    setData((oldData) =>
+      oldData.map((d) => (d.id !== serverDevice.id ? d : { ...serverDevice })),
+    )
+  }, [])
 
-  const reset = useCallback(() => {
+  const remove = useCallback(async (id) => {
+    await api.deleteDevice(id)
+    setData((oldData) => oldData.filter(({ id: did }) => did !== id))
+  }, [])
+
+  const reset = useCallback(async () => {
     setIsFetching(true)
-    return api.resetDevices().then((resetData) => {
-      setData(resetData)
-      setIsFetching(false)
-      return resetData
-    })
+    const resetData = await api.resetDevices()
+    setData(resetData)
+    setIsFetching(false)
+    return resetData
   }, [])
 
   return (

@@ -44,7 +44,7 @@ const DUMMY = Object.freeze([
   {
     id: '3u1reuv4',
     system_name: 'DESKTOP-0VCBIFF',
-    hdd_capacity: 1.247e24,
+    hdd_capacity: 1.208e24,
     type: 'linux',
   },
   {
@@ -327,7 +327,10 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
           <Button
             className='px-3'
             variant='ghost'
-            onClick={() => reset().then(resetAllFilters)}
+            onClick={async () => {
+              await reset()
+              resetAllFilters()
+            }}
           >
             <RefreshIcon />
           </Button>
@@ -373,7 +376,12 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
           )}
         </TableBody>
       </Table>
-      <Toaster position='bottom-center' closeButton />
+      <Toaster
+        position='bottom-center'
+        closeButton
+        richColors
+        toastOptions={{ ['duration']: 1_750 }}
+      />
     </>
   )
 }

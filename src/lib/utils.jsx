@@ -52,17 +52,16 @@ const CAPACITY_TIERS = Object.freeze({
 export const capitalize = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
 
-// Note: Units will overflow 1028 past 1.247e24
-export function calculateCapacity(hdd, singleDigits = false) {
+// Note: Units will overflow 1024 past 1.208e24
+export function calculateCapacity(hdd) {
   let counter = hdd
   let times = 0
 
-  // Note: Bit-wise shifting is not stable past 2^32, division is stable to ~1e308
-  while (counter / 1028 >= 1) {
-    counter /= 1028
+  // Note: Bit-wise shifting is not stable past 2^32, division is stable to ~1.8e308
+  while (counter / 1024 >= 1) {
+    counter /= 1024
     times += 1
   }
-  if (singleDigits) return `${Math.floor(counter)} ${CAPACITY_TIERS[times]}B`
 
   return `${Math.floor(counter * 100) / 100} ${CAPACITY_TIERS[times]}B`
 }
