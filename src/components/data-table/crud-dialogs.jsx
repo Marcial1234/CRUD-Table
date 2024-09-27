@@ -16,6 +16,9 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
   let [id, name, type, capacity] = ['', '', '', '']
   if (open && data) [id, name, type, capacity] = data
   const lowerCaseVariant = variant.toLowerCase()
+  let form,
+    nameField,
+    capacityField = []
 
   const variants = Object.freeze({
     create: {
@@ -47,10 +50,30 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
               onSubmit={async (e) => {
                 e.preventDefault()
 
+                if (!form) form = document.getElementById('crud-form')
+                nameField = document.getElementById('system_name')
+                capacityField = document.getElementById('hdd_capacity')
+
                 const formData = {}
                 for (let [k, v] of new FormData(e.target).entries()) {
                   formData[k] = v
                 }
+
+                // Manually validate for all-whitespace and decimals
+                formData['system_name'] = formData['system_name'].trim()
+                if (formData['system_name'].length === 0) {
+                  nameField.setCustomValidity(
+                    'Please add a non-whitespace value (A-Z, a-z, 0-9, all special characters, etc).',
+                  )
+                }
+                const hdd = Number(formData['hdd_capacity'])
+                if (hdd % 1 > 0) {
+                  const [before, after] = [Math.floor(hdd), Math.ceil(hdd)]
+                  capacityField.setCustomValidity(
+                    `Capacity must be in integers / round-numbers. The two nearest valid numbers are ${before} and ${after}.`,
+                  )
+                }
+                if (!form.reportValidity()) return
 
                 await action(formData)
                 if (lowerCaseVariant === 'create')
@@ -74,25 +97,31 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   autoComplete='on'
                   defaultValue={name}
                   maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrappable characters (i.e ' ', '-', etc)
+                  id='system_name'
+                  onChange={(e) =>
+                    document.getElementById('system_name').setCustomValidity('')
+                  }
                   name='system_name'
-                  // TODO: controlled validation
+                  required
                 />
               </div>
               <div className='grid'>
                 <span className='mb-1'>
                   HDD Capacity (in GB) <span className='text-red-600'>*</span>&nbsp;
                 </span>
-                {/* Note: validation for 'max' will show as "Please enter a number */}
                 <Input
                   autoComplete='on'
                   defaultValue={capacity ? Number(capacity) : ''}
-                  /*
                   max={1.208e24} // documented elsewhere: value that becomes higher than 1024 GeB
                   min={1}
-                  */
                   name='hdd_capacity'
-                  step={1}
+                  step='any'
                   type='number'
+                  id='hdd_capacity'
+                  onChange={(e) =>
+                    document.getElementById('hdd_capacity').setCustomValidity('')
+                  }
+                  required
                 />
               </div>
               <div className='grid'>
@@ -125,7 +154,9 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
               </span>
               <span>
                 This action&nbsp;
-                <u className='italic'>cannot</u>
+                <u>
+                  <i>cannot</i>
+                </u>
                 &nbsp;be undone.
               </span>
             </>
@@ -147,7 +178,7 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 toast.warning(`Device "${name}" was successfully deleted`)
                 setOpen(false)
               } else {
-                const form = document.getElementById('crud-form')
+                form = document.getElementById('crud-form')
                 if (form.reportValidity()) form.requestSubmit()
               }
             }}
