@@ -74,22 +74,15 @@ const TYPE_FILTER_OPTIONS = Object.freeze(
 
 export default function DataTable({ create, update, remove, reset, data = DUMMY }) {
   /*** Fields for determining action column visibility ***/
-  // used fields: setHoveredRow persistUPPopover
   const [hoveredRow, setHoveredRow] = useState('')
   const [persistUPPopover, setPersistUDPopover] = useState(false)
   /*****/
 
   /*** Modals/Dialogs open + information setters ***/
-  const [createOpen, setCreateOpen] = useState(false)
-
-  const [updateOpen, setUpdateOpen] = useState(false)
-  const [updateDiagData, setUpdateDiagData] = useState(
-    /* <boolean | [id, name, type, capacity]> */ false,
-  )
-
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deleteDiagData, setDeleteDiagData] = useState(
-    /* <boolean | [id, name, '', '']> */ false,
+  const [diagVariant, setDiagVariant] = useState('remove')
+  const [diagOpen, setDiagOpen] = useState(false)
+  const [diagData, setDiagData] = useState(
+    false /* <boolean | [id, name, type, capacity]> */,
   )
   /*****/
 
@@ -97,23 +90,14 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
 
-  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
-  const [allParams, setQueryParams] = useSearchParams()
-  const [globalFilter, setGlobalFilter] = useState(allParams.get('q') ?? [''])
-  useEffect(() => {
-    const g = globalFilter[0]
-    if (g === '' || !g) {
-      setQueryParams((qps) => {
-        qps.delete('q')
-        return qps
-      })
-    } else if (g && g !== decodeURI(allParams.get('q')))
-      setQueryParams((qps) => {
-        qps.set('q', encodeURI(g))
-        return qps
-      })
-  }, [globalFilter])
-  /*****/
+  const [allParams, setQueryParams] =
+    useSearchParams() /* Further use expanded further below */
+  const [globalFilter, setGlobalFilter] = useState(
+    allParams.get('q')
+      ? /* Necessary for forced-refresh attachment of param to state */
+        [allParams.get('q')]
+      : [''],
+  )
 
   const resetAllFilters = useCallback(() => {
     setSorting([])
@@ -160,20 +144,20 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
               keepOpen={() => setPersistUDPopover(true)}
               /* First set the dialog data so they don't flicker on open */
               openUpdateDialog={() => {
-                if (
-                  !setUpdateDiagData([
-                    getValue('id'),
-                    getValue('name'),
-                    getValue('type'),
-                    getValue('capacity'),
-                  ])
-                )
-                  setUpdateOpen(true)
+                setDiagVariant('update')
+                setDiagData([
+                  getValue('id'),
+                  getValue('name'),
+                  getValue('type'),
+                  getValue('capacity'),
+                ])
+                setDiagOpen(true)
               }}
               /* First set the dialog data so they don't flicker on open */
               openDeleteDialog={() => {
-                if (!setDeleteDiagData([getValue('id'), getValue('name'), '', '']))
-                  setDeleteOpen(true)
+                setDiagVariant('remove')
+                setDiagData([getValue('id'), getValue('name'), '', ''])
+                setDiagOpen(true)
               }}
             />
           </a>
@@ -242,35 +226,39 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
   )
   /*****/
 
+  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
+  useEffect(() => {
+    const g = globalFilter[0]
+    if (g === '' || !g)
+      setQueryParams((qps) => {
+        qps.delete('q')
+        return qps
+      })
+    else if (g && g !== decodeURI(allParams.get('q')))
+      setQueryParams({ q: encodeURI(g) })
+  }, [globalFilter])
+  /*****/
+
   return (
     <>
       {/* Dialogs */}
       <CrudDialog
-        open={createOpen}
-        setOpen={setCreateOpen}
-        action={create}
-        variant='create'
-      />
-      <CrudDialog
-        open={updateOpen}
-        setOpen={setUpdateOpen}
-        data={updateDiagData}
-        action={update}
-        variant='update'
-      />
-      <CrudDialog
-        open={deleteOpen}
-        setOpen={setDeleteOpen}
-        data={deleteDiagData}
-        action={remove}
-        variant='remove'
+        open={diagOpen}
+        setOpen={setDiagOpen}
+        data={diagData}
+        action={{ create, update, remove }}
+        variant={diagVariant}
       />
       {/* Title + Creation */}
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
         Devices
         <Button
           className='bg-[#337AB7] hover:bg-[#0054AE]'
-          onClick={() => setCreateOpen(true)}
+          onClick={() => {
+            setDiagVariant('create')
+            setDiagData([])
+            setDiagOpen(true)
+          }}
         >
           <PlusIcon /> &nbsp; Add device
         </Button>
@@ -380,7 +368,7 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
         position='bottom-center'
         closeButton
         richColors
-        toastOptions={{ ['duration']: 1_750 }}
+        toastOptions={{ ['duration']: 2_500 }}
       />
     </>
   )

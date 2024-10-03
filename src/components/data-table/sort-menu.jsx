@@ -1,5 +1,6 @@
 import Button from '@/components/shadcn/button'
 import Tooltip from '@/components/shadcn/tooltip'
+import { cn } from '@/lib/utils'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -9,19 +10,17 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
   useEffect(() => {
     if (disabled) return
 
-    if (!sorting.length || (sorting.length == 1 && sorting[0].id !== id)) {
-      setSort(0)
-    }
+    if (!sorting.length || (sorting.length == 1 && sorting[0].id !== id)) setSort(0)
   }, [id, disabled, sorting])
 
   const liteDirectionEnumMap = Object.freeze({
     0: 'Ascending',
     1: 'Descending',
-    2: 'Remove / reset sort',
+    2: 'Remove / Reset sort',
   })
   const toggleSort = useCallback(() => {
     toggle()
-    setSort((d) => (d + 1) % 3)
+    setSort((s) => (s + 1) % 3)
   }, [toggle])
 
   return (
@@ -29,7 +28,10 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
       <Button
         disabled={disabled}
         variant='outline'
-        className='border-dashed font-normal focus:bg-secondary-hover-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
+        className={cn(
+          'border-dashed font-normal focus:bg-secondary-hover-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+          sort ? 'bg-accent' : '',
+        )}
         onClick={toggleSort}
       >
         <span className='sr-only'>Open menu</span>

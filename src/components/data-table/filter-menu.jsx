@@ -111,7 +111,7 @@ export default function Menu({ column, title, options, disabled = false }) {
                           : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
-                      <CheckIcon className={cn('h-4 w-4')} />
+                      <CheckIcon className='h-4 w-4' />
                     </div>
                     <>
                       <span className='mr-1'> {option.icon}</span>

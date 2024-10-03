@@ -8,7 +8,7 @@ import {
 } from '@/components/shadcn/dialog'
 import Input from '@/components/shadcn/input'
 import { TYPE_ICONS, capitalize } from '@/lib/utils'
-import { memo } from 'react'
+import { memo, useRef } from 'react'
 import { toast } from 'sonner'
 
 export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
@@ -16,8 +16,8 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
   let [id, name, type, capacity] = ['', '', '', '']
   if (open && data) [id, name, type, capacity] = data
   const lowerCaseVariant = variant.toLowerCase()
-  let form,
-    nameField,
+  const formRef = useRef(null)
+  let nameField,
     capacityField = []
 
   const variants = Object.freeze({
@@ -45,12 +45,11 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
         <div className='flex flex-col space-y-1.5 text-left text-sm text-muted-foreground'>
           {lowerCaseVariant !== 'remove' ? (
             <form
-              id='crud-form'
+              ref={formRef}
               className='grid gap-4'
               onSubmit={async (e) => {
                 e.preventDefault()
 
-                if (!form) form = document.getElementById('crud-form')
                 nameField = document.getElementById('system_name')
                 capacityField = document.getElementById('hdd_capacity')
 
@@ -73,9 +72,9 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                     `Capacity must be in integers / round-numbers. The two nearest valid numbers are ${before} and ${after}.`,
                   )
                 }
-                if (!form.reportValidity()) return
+                if (!formRef.current.reportValidity()) return
 
-                await action(formData)
+                await action[lowerCaseVariant](formData)
                 if (lowerCaseVariant === 'create')
                   toast.success(
                     `Device "${formData['system_name']}" was successfully created`,
@@ -164,27 +163,29 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
         </div>
         <DialogFooter>
           <DialogClose>Cancel</DialogClose>
-          <DialogClose
-            className={`text-white ${
-              lowerCaseVariant == 'remove'
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-[#337AB7]  hover:bg-[#0054AE]'
-            }`}
-            onClick={async (e) => {
-              e.preventDefault()
-
-              if (lowerCaseVariant === 'remove') {
-                await action(id)
+          {lowerCaseVariant !== 'remove' ? (
+            <DialogClose
+              className='bg-[#337AB7] text-white  hover:bg-[#0054AE]'
+              onClick={(e) => {
+                e.preventDefault()
+                if (formRef.current.reportValidity()) formRef.current.requestSubmit()
+              }}
+            >
+              {variants[lowerCaseVariant].actionText}
+            </DialogClose>
+          ) : (
+            <DialogClose
+              className='bg-red-600 text-white hover:bg-red-700'
+              onClick={async (e) => {
+                e.preventDefault()
+                await action[lowerCaseVariant](id)
                 toast.warning(`Device "${name}" was successfully deleted`)
                 setOpen(false)
-              } else {
-                form = document.getElementById('crud-form')
-                if (form.reportValidity()) form.requestSubmit()
-              }
-            }}
-          >
-            {variants[lowerCaseVariant].actionText}
-          </DialogClose>
+              }}
+            >
+              {variants[lowerCaseVariant].actionText}
+            </DialogClose>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
