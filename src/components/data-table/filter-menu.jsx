@@ -28,7 +28,7 @@ export default function Menu({ column, title, options, disabled = false }) {
   if (disabled) return <Skeleton title={title} />
 
   const facets = column.getFacetedUniqueValues()
-  const facetsKeys = Array.from(new Map([...facets].reverse()).keys())
+  const facetsKeys = Array.from(new Map([...facets]).keys())
   const selectedValues = new Set(column.getFilterValue())
 
   const findClosetKey = (value) =>
@@ -37,22 +37,25 @@ export default function Menu({ column, title, options, disabled = false }) {
   return (
     <Popover>
       <PopoverTrigger asChild onMouseOver={(e) => e.preventDefault()}>
-        <Button variant='outline' className='w-60 border-dashed font-normal'>
+        <Button
+          variant='outline'
+          className={cn(
+            'w-60 border-dashed font-normal focus:border-none focus:bg-secondary-hover-background',
+            selectedValues.size > 0 ? 'border-none bg-accent focus:bg-accent' : '',
+          )}
+        >
           <FilterIcon className='mr-2' />
           Filter by {title}
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation='vertical' className='mx-2 h-4' />
-              <Badge
-                variant='secondary'
-                className='rounded-sm px-1 font-normal lg:hidden'
-              >
+              <Badge variant='' className='rounded-sm px-1 font-normal lg:hidden'>
                 {selectedValues.size}
               </Badge>
               <div className='hidden space-x-0.5 lg:flex lg:space-x-2'>
                 {selectedValues.size > 2 ||
                 (selectedValues.size == 2 && findClosetKey('win')) ? (
-                  <Badge variant='secondary' className='rounded-sm px-1 font-normal'>
+                  <Badge variant='' className='rounded-sm px-1 font-normal'>
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
@@ -60,7 +63,7 @@ export default function Menu({ column, title, options, disabled = false }) {
                     .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
-                        variant='secondary'
+                        variant=''
                         key={option.value}
                         className='rounded-sm px-1 font-normal'
                       >
@@ -103,6 +106,7 @@ export default function Menu({ column, title, options, disabled = false }) {
                     }}
                     className='mx-1 flex items-center gap-1'
                   >
+                    {/* Checked box with optionally invisible black check icon */}
                     <div
                       className={cn(
                         'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
@@ -113,9 +117,11 @@ export default function Menu({ column, title, options, disabled = false }) {
                     >
                       <CheckIcon className='h-4 w-4' />
                     </div>
+                    {/* Actual Row */}
                     <>
                       <span className='mr-1'> {option.icon}</span>
                       {capitalize(option.value)}
+                      {/* Faceted Value */}
                       {findClosetKey(option.value) && (
                         <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
                           {facets.get(findClosetKey(option.value))}

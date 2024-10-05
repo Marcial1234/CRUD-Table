@@ -8,37 +8,91 @@ import {
 } from '@/components/shadcn/dialog'
 import Input from '@/components/shadcn/input'
 import { TYPE_ICONS, capitalize } from '@/lib/utils'
-import { memo, useRef } from 'react'
+import { cn } from '@/lib/utils'
+import { TriangleAlert } from 'lucide-react'
+import { memo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
-  /* Not an ideal pattern, but shorter than sending them individually */
-  let [id, name, type, capacity] = ['', '', '', '']
-  if (open && data) [id, name, type, capacity] = data
-  const lowerCaseVariant = variant.toLowerCase()
-  const formRef = useRef(null)
-  let nameField,
-    capacityField = []
+const Options = memo(() =>
+  /* This is constant JSX that doesn't need to be re-rendered */
+  Object.keys(TYPE_ICONS).map((k, i) => (
+    <option value={k} key={i}>
+      {`${capitalize(k)} workstation`}
+    </option>
+  )),
+)
 
-  const variants = Object.freeze({
-    create: {
-      title: 'Add Device',
-      actionText: <span className='px-2.5'>Add</span>,
-    },
-    update: {
-      title: 'Edit Device',
-      actionText: <span className='px-2.5'>Edit</span>,
-    },
-    remove: {
-      title: 'Delete Device?',
-      actionText: <span className='px-1'>Delete</span>,
-    },
+const ValidationError = ({ message }) =>
+  message ? (
+    <div
+      className='mt-1 text-red-300'
+      /* only way I got them to align */
+      style={{ display: 'ruby' }}
+    >
+      <TriangleAlert className='relative mr-1' width='12' />
+      {message}
+    </div>
+  ) : (
+    ''
+  )
+
+const VARIANTS = Object.freeze({
+  create: {
+    title: 'Add Device',
+    actionText: <span className='px-2.5'>Add</span>,
+  },
+  update: {
+    title: 'Edit Device',
+    actionText: <span className='px-2.5'>Edit</span>,
+  },
+  remove: {
+    title: 'Delete Device?',
+    actionText: <span className='px-1'>Delete</span>,
+  },
+})
+
+export default function CrudDialog({
+  allData: {
+    open,
+    data: { id, name, type, capacity },
+    variant,
+  },
+  setOpen,
+  action,
+}) {
+  const lowerCaseVariant = variant.toLowerCase()
+
+  const formRef = useRef(null)
+  const inputRefs = useRef({})
+  const [errors, setErrors] = useState({
+    name: null,
+    type: null,
+    capacity: null,
   })
+  const setNameError = (err) => setErrors((errs) => ({ ...errs, name: err }))
+  const setCapacityError = (err) => setErrors((errs) => ({ ...errs, capacity: err }))
+  const setTypeError = (err) => setErrors((errs) => ({ ...errs, type: err }))
+
+  const autoFocusOnInvalid = () => {
+    if (Object.values(errors).filter(Boolean).length === 0) return
+    // Autofocus on first invalid field
+    const firstInvalidField =
+      Object.keys(errors)[Object.values(errors).findIndex(Boolean)]
+
+    inputRefs.current[firstInvalidField].focus()
+    return true
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o)
+        setErrors({})
+      }}
+    >
       <DialogContent>
-        <DialogTitle>{variants[variant].title}</DialogTitle>
+        <DialogTitle>{VARIANTS[variant].title}</DialogTitle>
         <DialogDescription className='hidden'>
           {variant} dialog {/* `description` element avoids an a11y warning */}
         </DialogDescription>
@@ -50,29 +104,11 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
               onSubmit={async (e) => {
                 e.preventDefault()
 
-                nameField = document.getElementById('system_name')
-                capacityField = document.getElementById('hdd_capacity')
-
                 const formData = {}
                 for (let [k, v] of new FormData(e.target).entries()) {
+                  if (k === 'system_name') v = v.trim()
                   formData[k] = v
                 }
-
-                // Manually validate for all-whitespace and decimals
-                formData['system_name'] = formData['system_name'].trim()
-                if (formData['system_name'].length === 0) {
-                  nameField.setCustomValidity(
-                    'Please add a non-whitespace value (A-Z, a-z, 0-9, all special characters, etc).',
-                  )
-                }
-                const hdd = Number(formData['hdd_capacity'])
-                if (hdd % 1 > 0) {
-                  const [before, after] = [Math.floor(hdd), Math.ceil(hdd)]
-                  capacityField.setCustomValidity(
-                    `Capacity must be in integers / round-numbers. The two nearest valid numbers are ${before} and ${after}.`,
-                  )
-                }
-                if (!formRef.current.reportValidity()) return
 
                 await action[lowerCaseVariant](formData)
                 if (lowerCaseVariant === 'create')
@@ -93,57 +129,120 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                   System Name <span className='text-red-600'>*</span>&nbsp;
                 </span>
                 <Input
+                  name='system_name'
+                  className={errors.name ? 'border-rose-300' : ''}
                   autoComplete='on'
                   defaultValue={name}
-                  maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrappable characters (i.e ' ', '-', etc)
-                  id='system_name'
-                  onChange={(e) =>
-                    document.getElementById('system_name').setCustomValidity('')
-                  }
-                  name='system_name'
+                  ref={(ref) => (inputRefs.current.name = ref)}
+                  maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrap characters (i.e ' ', '-', etc)
+                  /* Surface native invalid messages */
+                  onInvalid={(e) => {
+                    e.preventDefault()
+                    return setNameError(e.target.validationMessage)
+                  }}
+                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
+                  onBlur={(e) => {
+                    if (!open || !inputRefs.current.name.reportValidity()) return
+
+                    const v = e.target.value
+                    if (v === name) return
+
+                    if (v.trim().length === 0)
+                      return setNameError(
+                        'Please add a non-whitespace value (A-Z, a-z, 0-9, special characters, etc)',
+                      )
+
+                    return setNameError(null)
+                  }}
                   required
                 />
+                <ValidationError message={errors.name ?? ''} />
               </div>
               <div className='grid'>
                 <span className='mb-1'>
-                  HDD Capacity (in GB) <span className='text-red-600'>*</span>&nbsp;
+                  HDD Capacity (in GB) <span className='text-red-600'>*</span>
+                  &nbsp;
                 </span>
                 <Input
+                  name='hdd_capacity'
+                  className={errors.capacity ? 'border-rose-300' : ''}
                   autoComplete='on'
                   defaultValue={capacity ? Number(capacity) : ''}
-                  max={1.208e24} // documented elsewhere: value that becomes higher than 1024 GeB
-                  min={1}
-                  name='hdd_capacity'
-                  step='any'
                   type='number'
-                  id='hdd_capacity'
-                  onChange={(e) =>
-                    document.getElementById('hdd_capacity').setCustomValidity('')
-                  }
+                  step='any' /* manual step validation `onBlur */
+                  min={1}
+                  ref={(ref) => (inputRefs.current.capacity = ref)}
+                  /* Surface native invalid messages */
+                  onInvalid={(e) => {
+                    e.preventDefault()
+
+                    const message = e.target.validationMessage
+                    if (message !== 'Please enter a number.')
+                      return setCapacityError(message)
+
+                    return setCapacityError(
+                      'Invalid exponential (correct format is `1e1`), or must be smaller than 1.208e24',
+                    )
+                  }}
+                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
+                  onBlur={(e) => {
+                    if (!open || !inputRefs.current.capacity.reportValidity()) return
+
+                    const v = e.target.value
+                    if (v === capacity) return
+
+                    if (v > 1.208e24)
+                      return setCapacityError(
+                        // Documented on README
+                        'Capacity cannot be bigger than 1.208e24 GB / 1024 GeB',
+                      )
+
+                    if (v % 1 !== 0)
+                      return setCapacityError(
+                        `Capacity must be in integers / round-numbers.
+                         The two nearest valid numbers are
+                         ${Math.floor(v)} and ${Math.ceil(v)}`,
+                      )
+
+                    return setCapacityError(null)
+                  }}
                   required
                 />
+                <ValidationError message={errors.capacity ?? ''} />
               </div>
               <div className='grid'>
                 <span className='mb-1'>
                   Device Type <span className='text-red-600'>*</span>&nbsp;
                 </span>
                 <select
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                  defaultValue={type ?? ''}
                   name='type'
+                  defaultValue={type ?? ''}
+                  ref={(ref) => (inputRefs.current.type = ref)}
+                  onChange={() => setErrors((errs) => ({ ...errs, type: null }))}
+                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
+                  onBlur={(_) => {
+                    if (!open || !inputRefs.current.type.reportValidity()) return
+                  }}
+                  onInvalid={(e) => {
+                    e.preventDefault()
+                    return setTypeError(e.target.validationMessage)
+                  }}
+                  className={cn(
+                    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    errors.type ? 'border-rose-300' : '',
+                  )}
                   required
                 >
                   <option className='hidden' disabled value=''>
                     Select type
                   </option>
-                  {Object.keys(TYPE_ICONS).map((k, i) => (
-                    <option className={k.toLowerCase()} value={k} key={i}>
-                      {`${capitalize(k)} workstation`}
-                    </option>
-                  ))}
+                  <Options />
                 </select>
+                <ValidationError message={errors.type ?? ''} />
               </div>
-              <button className='hidden'> silent submit </button>
+              <button className='hidden' onSubmit={autoFocusOnInvalid}>
+                silent submit
+              </button>
             </form>
           ) : (
             <>
@@ -168,10 +267,11 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
               className='bg-[#337AB7] text-white  hover:bg-[#0054AE]'
               onClick={(e) => {
                 e.preventDefault()
-                if (formRef.current.reportValidity()) formRef.current.requestSubmit()
+                if (autoFocusOnInvalid()) return
+                formRef.current.requestSubmit()
               }}
             >
-              {variants[lowerCaseVariant].actionText}
+              {VARIANTS[lowerCaseVariant].actionText}
             </DialogClose>
           ) : (
             <DialogClose
@@ -183,13 +283,11 @@ export const CrudDialog = memo(({ open, setOpen, data, action, variant }) => {
                 setOpen(false)
               }}
             >
-              {variants[lowerCaseVariant].actionText}
+              {VARIANTS[lowerCaseVariant].actionText}
             </DialogClose>
           )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
-})
-CrudDialog.displayName = 'CrudDialog'
-export default CrudDialog
+}

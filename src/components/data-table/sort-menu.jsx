@@ -24,13 +24,16 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
   }, [toggle])
 
   return (
-    <Tooltip content={`Next sorting order: ${liteDirectionEnumMap[sort]}`}>
+    <Tooltip
+      className='my-1'
+      content={`Next sorting order: ${liteDirectionEnumMap[sort]}`}
+    >
       <Button
         disabled={disabled}
         variant='outline'
         className={cn(
-          'border-dashed font-normal focus:bg-secondary-hover-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          sort ? 'bg-accent' : '',
+          'border-dashed font-normal focus:border-none focus:bg-secondary-hover-background',
+          sort ? 'border-none bg-accent	focus:bg-accent' : '',
         )}
         onClick={toggleSort}
       >

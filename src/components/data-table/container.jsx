@@ -79,11 +79,13 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
   /*****/
 
   /*** Modals/Dialogs open + information setters ***/
-  const [diagVariant, setDiagVariant] = useState('remove')
-  const [diagOpen, setDiagOpen] = useState(false)
-  const [diagData, setDiagData] = useState(
-    false /* <boolean | [id, name, type, capacity]> */,
-  )
+  const [dialog, setDialog] = useState({
+    variant: 'remove',
+    open: false,
+    data: {
+      /* id, name, type, capacity */
+    },
+  })
   /*****/
 
   /*** React/TanStack Table fields ***/
@@ -136,31 +138,40 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
       {
         id: 'actions',
         cell: ({ row: { id, getValue } }) => (
-          <a onMouseLeave={() => setPersistUDPopover(false)}>
-            <ActionMenu
-              id={id}
-              hoveredRow={hoveredRow}
-              close={() => setHoveredRow(null)}
-              keepOpen={() => setPersistUDPopover(true)}
-              /* First set the dialog data so they don't flicker on open */
-              openUpdateDialog={() => {
-                setDiagVariant('update')
-                setDiagData([
-                  getValue('id'),
-                  getValue('name'),
-                  getValue('type'),
-                  getValue('capacity'),
-                ])
-                setDiagOpen(true)
-              }}
-              /* First set the dialog data so they don't flicker on open */
-              openDeleteDialog={() => {
-                setDiagVariant('remove')
-                setDiagData([getValue('id'), getValue('name'), '', ''])
-                setDiagOpen(true)
-              }}
-            />
-          </a>
+          <Tooltip side='right' content='Modify Device'>
+            <a onMouseLeave={() => setPersistUDPopover(false)}>
+              <ActionMenu
+                id={id}
+                hoveredRow={hoveredRow}
+                close={() => setHoveredRow(null)}
+                keepOpen={() => setPersistUDPopover(true)}
+                /* First set the dialog data so they don't flicker on open */
+                openUpdateDialog={() => {
+                  setDialog({
+                    variant: 'update',
+                    open: true,
+                    data: {
+                      id: getValue('id'),
+                      name: getValue('name'),
+                      type: getValue('type'),
+                      capacity: getValue('capacity'),
+                    },
+                  })
+                }}
+                /* First set the dialog data so they don't flicker on open */
+                openDeleteDialog={() => {
+                  setDialog({
+                    variant: 'remove',
+                    open: true,
+                    data: {
+                      id: getValue('id'),
+                      name: getValue('name'),
+                    },
+                  })
+                }}
+              />
+            </a>
+          </Tooltip>
         ),
       },
       /* Hidden columns. These are required for easier filtering / sorting */
@@ -217,13 +228,9 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
     getSortedRowModel: getSortedRowModel(),
   })
 
-  const filtrableData = useMemo(
-    () =>
-      table
-        .getAllColumns()
-        .filter(({ columnDef: { header } }) => typeof header === typeof ''),
-    [table],
-  )
+  const filtrableData = table
+    .getAllColumns()
+    .filter(({ columnDef: { header } }) => typeof header === typeof '')
   /*****/
 
   /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
@@ -241,13 +248,10 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
 
   return (
     <>
-      {/* Dialogs */}
       <CrudDialog
-        open={diagOpen}
-        setOpen={setDiagOpen}
-        data={diagData}
+        allData={dialog}
+        setOpen={(open) => setDialog((d) => ({ ...d, open }))}
         action={{ create, update, remove }}
-        variant={diagVariant}
       />
       {/* Title + Creation */}
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
@@ -255,9 +259,7 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
         <Button
           className='bg-[#337AB7] hover:bg-[#0054AE]'
           onClick={() => {
-            setDiagVariant('create')
-            setDiagData([])
-            setDiagOpen(true)
+            setDialog({ variant: 'create', open: true, data: {} })
           }}
         >
           <PlusIcon /> &nbsp; Add device

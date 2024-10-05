@@ -21,7 +21,7 @@ export default function Menu({
       <DropdownMenuTrigger asChild onMouseEnter={keepOpen}>
         <Button
           variant='ghost'
-          className={cn(hoveredRow == id ? 'visible' : 'invisible', 'h-8 w-8 p-0')}
+          className={cn(hoveredRow == id ? 'visible' : 'invisible', 'h-9 w-9 p-0')}
         >
           <span className='sr-only'>Open CRUD actions menu</span>
           <MoreHorizontal className='h-4 w-4' />

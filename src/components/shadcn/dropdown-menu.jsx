@@ -4,7 +4,11 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle } from 'lucide-react'
 import { forwardRef } from 'react'
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu = forwardRef(({ children, ...props }, ref) => (
+  <DropdownMenuPrimitive.Root ref={ref} {...props}>
+    {children}
+  </DropdownMenuPrimitive.Root>
+))
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
