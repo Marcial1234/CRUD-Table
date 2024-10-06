@@ -33,15 +33,20 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
         variant='outline'
         className={cn(
           'border-dashed font-normal focus:border-none focus:bg-secondary-hover-background',
-          sort ? 'border-none bg-accent	focus:bg-accent' : '',
+          sort ? 'border-none bg-accent	hover:bg-accent focus:bg-accent' : '',
         )}
         onClick={toggleSort}
       >
         <span className='sr-only'>Open menu</span>
-        {!sort && <ArrowUpDown width='15' className='mr-2' />}
-        {sort === 1 && <ArrowDown width='15' className='mr-2' />}
-        {sort === 2 && <ArrowUp width='15' className='mr-2' />}
-        {title}
+        {!sort ? (
+          <ArrowUpDown width='15' className='mr-2' />
+        ) : sort === 1 ? (
+          <ArrowUp width='15' className='mr-2' />
+        ) : (
+          /* sort === 2 */ <ArrowDown width='15' className='mr-2' />
+        )}
+        Sort{!!sort && <>ed</>} by {title}
+        {!!sort && <> ({liteDirectionEnumMap[sort - 1]})</>}
       </Button>
     </Tooltip>
   )

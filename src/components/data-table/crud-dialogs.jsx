@@ -63,7 +63,9 @@ export default function CrudDialog({
   const lowerCaseVariant = variant.toLowerCase()
 
   const formRef = useRef(null)
-  const inputRefs = useRef({})
+  const inputRefs = useRef({
+    /* name, type, capacity */
+  })
   const [errors, setErrors] = useState({
     name: null,
     type: null,
@@ -73,14 +75,16 @@ export default function CrudDialog({
   const setCapacityError = (err) => setErrors((errs) => ({ ...errs, capacity: err }))
   const setTypeError = (err) => setErrors((errs) => ({ ...errs, type: err }))
 
-  const autoFocusOnInvalid = () => {
-    if (Object.values(errors).filter(Boolean).length === 0) return
-    // Autofocus on first invalid field
+  const submitOrFocusOnFirstInvalid = (e) => {
+    e.preventDefault()
+
+    if (Object.values(errors).filter(Boolean).length === 0)
+      return formRef.current.requestSubmit()
+
     const firstInvalidField =
       Object.keys(errors)[Object.values(errors).findIndex(Boolean)]
 
     inputRefs.current[firstInvalidField].focus()
-    return true
   }
 
   return (
@@ -160,6 +164,36 @@ export default function CrudDialog({
               </div>
               <div className='grid'>
                 <span className='mb-1'>
+                  Device Type <span className='text-red-600'>*</span>&nbsp;
+                </span>
+                <select
+                  name='type'
+                  defaultValue={type ?? ''}
+                  ref={(ref) => (inputRefs.current.type = ref)}
+                  onChange={() => setTypeError(null)}
+                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
+                  onBlur={(_) => {
+                    if (!open || !inputRefs.current.type.reportValidity()) return
+                  }}
+                  onInvalid={(e) => {
+                    e.preventDefault()
+                    return setTypeError(e.target.validationMessage)
+                  }}
+                  className={cn(
+                    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    errors.type ? 'border-rose-300' : '',
+                  )}
+                  required
+                >
+                  <option className='hidden' disabled value=''>
+                    Select type
+                  </option>
+                  <Options />
+                </select>
+                <ValidationError message={errors.type ?? ''} />
+              </div>
+              <div className='grid'>
+                <span className='mb-1'>
                   HDD Capacity (in GB) <span className='text-red-600'>*</span>
                   &nbsp;
                 </span>
@@ -210,37 +244,7 @@ export default function CrudDialog({
                 />
                 <ValidationError message={errors.capacity ?? ''} />
               </div>
-              <div className='grid'>
-                <span className='mb-1'>
-                  Device Type <span className='text-red-600'>*</span>&nbsp;
-                </span>
-                <select
-                  name='type'
-                  defaultValue={type ?? ''}
-                  ref={(ref) => (inputRefs.current.type = ref)}
-                  onChange={() => setErrors((errs) => ({ ...errs, type: null }))}
-                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
-                  onBlur={(_) => {
-                    if (!open || !inputRefs.current.type.reportValidity()) return
-                  }}
-                  onInvalid={(e) => {
-                    e.preventDefault()
-                    return setTypeError(e.target.validationMessage)
-                  }}
-                  className={cn(
-                    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    errors.type ? 'border-rose-300' : '',
-                  )}
-                  required
-                >
-                  <option className='hidden' disabled value=''>
-                    Select type
-                  </option>
-                  <Options />
-                </select>
-                <ValidationError message={errors.type ?? ''} />
-              </div>
-              <button className='hidden' onSubmit={autoFocusOnInvalid}>
+              <button className='hidden' onClick={submitOrFocusOnFirstInvalid}>
                 silent submit
               </button>
             </form>
@@ -265,11 +269,7 @@ export default function CrudDialog({
           {lowerCaseVariant !== 'remove' ? (
             <DialogClose
               className='bg-[#337AB7] text-white  hover:bg-[#0054AE]'
-              onClick={(e) => {
-                e.preventDefault()
-                if (autoFocusOnInvalid()) return
-                formRef.current.requestSubmit()
-              }}
+              onClick={submitOrFocusOnFirstInvalid}
             >
               {VARIANTS[lowerCaseVariant].actionText}
             </DialogClose>

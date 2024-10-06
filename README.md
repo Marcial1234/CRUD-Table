@@ -15,7 +15,7 @@ Then browse to [`http://localhost:3000`](http://localhost:3000)
 ### Run
 
 ```bash
-npm run dev
+npm i ; npm run dev
 ```
 
 Google Chrome will pop up if you're using Windows. Otherwise, navigate to [`http://localhost:5173`](http://localhost:5173)
@@ -43,7 +43,7 @@ You should then be able to deploy/containerize all contents under [`server`](ser
     │   │  ├─ index.js: Named exports
     │   │  └─ ... rest of the module's components ...
     │   └─ shadcn
-    │      └─ ... Modified Radix + ShadCn components ...
+    │      └─ ... Modified shadcn (Radix + Tailwind) components ...
     ├─ layouts
     ├─ lib
     ├─ table-page.jsx: Integrates API fetchers with UI loading state

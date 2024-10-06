@@ -24,6 +24,7 @@ function Skeleton({ title }) {
   )
 }
 
+/* There is `state` here changing (`selectedValues`) outside of `useState` - using logic from ShadCn Form directly... */
 export default function Menu({ column, title, options, disabled = false }) {
   if (disabled) return <Skeleton title={title} />
 
@@ -41,7 +42,9 @@ export default function Menu({ column, title, options, disabled = false }) {
           variant='outline'
           className={cn(
             'w-60 border-dashed font-normal focus:border-none focus:bg-secondary-hover-background',
-            selectedValues.size > 0 ? 'border-none bg-accent focus:bg-accent' : '',
+            selectedValues.size > 0
+              ? 'border-none bg-accent hover:bg-accent focus:bg-accent'
+              : '',
           )}
         >
           <FilterIcon className='mr-2' />
@@ -49,13 +52,13 @@ export default function Menu({ column, title, options, disabled = false }) {
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation='vertical' className='mx-2 h-4' />
-              <Badge variant='' className='rounded-sm px-1 font-normal lg:hidden'>
+              <Badge className='rounded-sm px-1 font-normal lg:hidden'>
                 {selectedValues.size}
               </Badge>
               <div className='hidden space-x-0.5 lg:flex lg:space-x-2'>
                 {selectedValues.size > 2 ||
                 (selectedValues.size == 2 && findClosetKey('win')) ? (
-                  <Badge variant='' className='rounded-sm px-1 font-normal'>
+                  <Badge className='rounded-sm px-1 font-normal'>
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
@@ -63,7 +66,6 @@ export default function Menu({ column, title, options, disabled = false }) {
                     .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
-                        variant=''
                         key={option.value}
                         className='rounded-sm px-1 font-normal'
                       >
