@@ -4,7 +4,7 @@
 
 ### Quick Run
 
-Using `npm` (or your package-manager of choice - such as [`pnpm`](https://pnpm.io/installation#using-a-standalone-script)), you can install and run only the server directly as built frontend application is included and available thru:
+Using `npm` (or your package-manager of choice - such as [`pnpm`](https://pnpm.io/installation#using-a-standalone-script)), you can install and run the server directly as the built frontend application is included and available thru:
 
 ```bash
 cd server : npm i ; babel-node index.js
