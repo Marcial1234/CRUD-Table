@@ -32,7 +32,8 @@ export default function Menu({ column, title, options, disabled = false }) {
   const facetsKeys = Array.from(new Map([...facets]).keys())
   const selectedValues = new Set(column.getFilterValue())
 
-  const findClosetKey = (value) =>
+  // Since we're mapping 'mac' => 'macapple', we need a partial search-match
+  const findPartialKey = (value) =>
     facetsKeys.find((k) => k.toLowerCase().includes(value.toLowerCase()))
 
   return (
@@ -48,16 +49,15 @@ export default function Menu({ column, title, options, disabled = false }) {
           )}
         >
           <FilterIcon className='mr-2' />
-          Filter by {title}
-          {selectedValues?.size > 0 && (
+          Filter{selectedValues.size > 0 ? <>ed by</> : <> by {title}</>}
+          {selectedValues.size > 0 && (
             <>
               <Separator orientation='vertical' className='mx-2 h-4' />
               <Badge className='rounded-sm px-1 font-normal lg:hidden'>
                 {selectedValues.size}
               </Badge>
               <div className='hidden space-x-0.5 lg:flex lg:space-x-2'>
-                {selectedValues.size > 2 ||
-                (selectedValues.size == 2 && findClosetKey('win')) ? (
+                {selectedValues.size > 2 ? (
                   <Badge className='rounded-sm px-1 font-normal'>
                     {selectedValues.size} selected
                   </Badge>
@@ -90,7 +90,7 @@ export default function Menu({ column, title, options, disabled = false }) {
         >
           <CommandInput autoFocus placeholder={title} />
           <CommandList>
-            <CommandEmpty>No results found</CommandEmpty>
+            <CommandEmpty>No {title.toLowerCase()} found</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 let isSelected = selectedValues.has(option.value)
@@ -124,11 +124,9 @@ export default function Menu({ column, title, options, disabled = false }) {
                       <span className='mr-1'> {option.icon}</span>
                       {capitalize(option.value)}
                       {/* Faceted Value */}
-                      {findClosetKey(option.value) && (
-                        <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
-                          {facets.get(findClosetKey(option.value))}
-                        </span>
-                      )}
+                      <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
+                        {facets.get(findPartialKey(option.value))}
+                      </span>
                     </>
                   </CommandItem>
                 )

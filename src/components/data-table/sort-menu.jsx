@@ -38,15 +38,15 @@ export default function Menu({ title, toggle, sorting, id, disabled = false }) {
         onClick={toggleSort}
       >
         <span className='sr-only'>Open menu</span>
-        {!sort ? (
+        {sort === 0 ? (
           <ArrowUpDown width='15' className='mr-2' />
         ) : sort === 1 ? (
           <ArrowUp width='15' className='mr-2' />
         ) : (
           /* sort === 2 */ <ArrowDown width='15' className='mr-2' />
         )}
-        Sort{!!sort && <>ed</>} by {title}
-        {!!sort && <> ({liteDirectionEnumMap[sort - 1]})</>}
+        Sort{sort !== 0 && <>ed</>} by {title}
+        {sort !== 0 && <> ({liteDirectionEnumMap[sort - 1]})</>}
       </Button>
     </Tooltip>
   )

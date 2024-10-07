@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/shadcn/table'
 import Tooltip from '@/components/shadcn/tooltip'
+import useQueryParam from '@/hooks/use-query-param'
 import { TYPE_ICONS } from '@/lib/utils'
 import {
   flexRender,
@@ -24,8 +25,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { Toaster } from 'sonner'
 
 import CrudDialog from './crud-dialogs'
@@ -92,23 +92,18 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
 
-  const [allParams, setQueryParams] =
-    useSearchParams() /* Further use expanded further below */
-  const [globalFilter, setGlobalFilter] = useState(
-    allParams.get('q')
-      ? /* Necessary for forced-refresh attachment of param to state */
-        [allParams.get('q')]
-      : [''],
-  )
+  // Two-way attachment of the `?q=[param]` as global filter input field
+  const [globalFilter, setGlobalFilter] = useQueryParam({
+    paramKey: 'q',
+    defaultValue: '',
+    /* Defined per TanStack Table array-style filters. */
+    setter: (v) => [v],
+  })
 
   const resetAllFilters = useCallback(() => {
     setSorting([])
     setColumnFilters([])
-    setGlobalFilter([''])
-    setQueryParams((qps) => {
-      if (qps.get('q')) qps.delete('q')
-      return qps
-    })
+    setGlobalFilter('')
   }, [])
 
   const HIDDEN_COLUMNS = Object.freeze({
@@ -233,19 +228,6 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
     .filter(({ columnDef: { header } }) => typeof header === typeof '')
   /*****/
 
-  /*** Two-way attachment of the `?q=[param]` as global filter input field ***/
-  useEffect(() => {
-    const g = globalFilter[0]
-    if (g === '' || !g)
-      setQueryParams((qps) => {
-        qps.delete('q')
-        return qps
-      })
-    else if (g && g !== decodeURI(allParams.get('q')))
-      setQueryParams({ q: encodeURI(g) })
-  }, [globalFilter])
-  /*****/
-
   return (
     <>
       <CrudDialog
@@ -274,10 +256,10 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
               autoFocus
               autoComplete='on'
               id='gFilter'
-              value={globalFilter ?? ''}
+              value={globalFilter}
               className='pl-8'
               placeholder='Search anything within all devices'
-              onChange={(e) => setGlobalFilter(e.target.value.split())}
+              onChange={(e) => setGlobalFilter(e.target.value)}
             />
           </div>
           {/* Filters */}
@@ -301,7 +283,7 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
               sorting={sorting}
             />
           ))}
-          {sorting?.length || globalFilter[0] != '' || columnFilters?.length ? (
+          {sorting.length || globalFilter[0] != '' || columnFilters.length ? (
             <Button
               variant='ghost'
               className='hover:bg-secondary-hover-background'
@@ -318,8 +300,8 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
             className='px-3'
             variant='ghost'
             onClick={async () => {
-              await reset()
               resetAllFilters()
+              await reset()
             }}
           >
             <RefreshIcon />
@@ -346,7 +328,7 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
         <TableBody
           onMouseLeave={() => (persistUPPopover ? null : setHoveredRow(null))}
         >
-          {!table.getRowModel().rows?.length ? (
+          {!table.getRowModel().rows.length ? (
             <NoResults colSpan={columns.length} />
           ) : (
             table.getRowModel().rows.map((row) => (

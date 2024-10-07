@@ -24,12 +24,8 @@ const Options = memo(() =>
 
 const ValidationError = ({ message }) =>
   message ? (
-    <div
-      className='mt-1 text-red-300'
-      /* only way I got them to align */
-      style={{ display: 'ruby' }}
-    >
-      <TriangleAlert className='relative mr-1' width='12' />
+    <div className='mt-1 flex text-red-300'>
+      <TriangleAlert className='relative top-[-1px] mr-1' width='12' />
       {message}
     </div>
   ) : (
