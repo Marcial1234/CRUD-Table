@@ -9,6 +9,7 @@ import {
 import Input from '@/components/shadcn/input'
 import { TYPE_ICONS, capitalize } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { MAX_CAPACITY, calculateCapacity } from '@/lib/utils'
 import { TriangleAlert } from 'lucide-react'
 import { memo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -59,9 +60,11 @@ export default function CrudDialog({
   const lowerCaseVariant = variant.toLowerCase()
 
   const formRef = useRef(null)
-  const inputRefs = useRef({
-    /* name, type, capacity */
-  })
+  const inputRefs = useRef(
+    /* current: */ {
+      /* name, type, capacity */
+    },
+  )
   const [errors, setErrors] = useState({
     name: null,
     type: null,
@@ -81,6 +84,13 @@ export default function CrudDialog({
       Object.keys(errors)[Object.values(errors).findIndex(Boolean)]
 
     inputRefs.current[firstInvalidField].focus()
+  }
+
+  const chosenCapacity = inputRefs.current.capacity || { value: capacity }
+
+  const showCapacityConversion = () => {
+    const val = chosenCapacity
+    if (val && val.value && val.value > 0 && val.value % 1 === 0) return true
   }
 
   return (
@@ -133,15 +143,36 @@ export default function CrudDialog({
                   className={errors.name ? 'border-rose-300' : ''}
                   autoComplete='on'
                   defaultValue={name}
-                  ref={(ref) => (inputRefs.current.name = ref)}
                   maxLength={96} // the length where the table starts to overflow at 50% on my screen WITHOUT wrap characters (i.e ' ', '-', etc)
+                  required
+                  ref={(ref) => (inputRefs.current.name = ref)}
+                  placeholder='A very creative name...'
                   /* Surface native invalid messages */
                   onInvalid={(e) => {
                     e.preventDefault()
                     return setNameError(e.target.validationMessage)
                   }}
-                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
+                  // UI edge case: Clicking the 'X' from dialog OR the `actionText` button will trigger `onBlur`.
+                  // Only this field has this as it is auto-focused due to being the first.
+                  // Note: *very brittle*
                   onBlur={(e) => {
+                    const target = e.nativeEvent.relatedTarget
+                    if (
+                      target &&
+                      (target.className.includes(
+                        'absolute',
+                        /* 'X' DialogClose button */
+                      ) ||
+                        target.className.includes(
+                          'rounded-md p-2',
+                          /* `actionText` button */
+                        ))
+                    )
+                      return e.preventDefault()
+
+                    inputRefs.current.name.reportValidity()
+                  }}
+                  onChange={(e) => {
                     if (!open || !inputRefs.current.name.reportValidity()) return
 
                     const v = e.target.value
@@ -154,9 +185,8 @@ export default function CrudDialog({
 
                     return setNameError(null)
                   }}
-                  required
                 />
-                <ValidationError message={errors.name ?? ''} />
+                <ValidationError message={errors.name} />
               </div>
               <div className='grid'>
                 <span className='mb-1'>
@@ -165,12 +195,13 @@ export default function CrudDialog({
                 <select
                   name='type'
                   defaultValue={type ?? ''}
+                  required
                   ref={(ref) => (inputRefs.current.type = ref)}
-                  onChange={() => setTypeError(null)}
-                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
-                  onBlur={(_) => {
-                    if (!open || !inputRefs.current.type.reportValidity()) return
+                  onBlur={() => inputRefs.current.type.reportValidity()}
+                  onChange={() => {
+                    if (errors.type) setTypeError(null)
                   }}
+                  /* Surface native invalid messages */
                   onInvalid={(e) => {
                     e.preventDefault()
                     return setTypeError(e.target.validationMessage)
@@ -179,66 +210,89 @@ export default function CrudDialog({
                     'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     errors.type ? 'border-rose-300' : '',
                   )}
-                  required
                 >
                   <option className='hidden' disabled value=''>
                     Select type
                   </option>
                   <Options />
                 </select>
-                <ValidationError message={errors.type ?? ''} />
+                <ValidationError message={errors.type} />
               </div>
               <div className='grid'>
                 <span className='mb-1'>
                   HDD Capacity (in GB) <span className='text-red-600'>*</span>
                   &nbsp;
                 </span>
-                <Input
-                  name='hdd_capacity'
-                  className={errors.capacity ? 'border-rose-300' : ''}
-                  autoComplete='on'
-                  defaultValue={capacity ? Number(capacity) : ''}
-                  type='number'
-                  step='any' /* manual step validation `onBlur */
-                  min={1}
-                  ref={(ref) => (inputRefs.current.capacity = ref)}
-                  /* Surface native invalid messages */
-                  onInvalid={(e) => {
-                    e.preventDefault()
+                <div className='grid items-center justify-items-end'>
+                  <Input
+                    name='hdd_capacity'
+                    className={errors.capacity ? 'border-rose-300' : ''}
+                    autoComplete='on'
+                    defaultValue={capacity ? Number(capacity) : ''}
+                    type='number'
+                    step='any' /* manual step validation `onChange */
+                    min={1}
+                    required
+                    ref={(ref) => (inputRefs.current.capacity = ref)}
+                    placeholder='Values will be converted to higher units'
+                    /* Surface native invalid messages */
+                    onInvalid={(e) => {
+                      e.preventDefault()
 
-                    const message = e.target.validationMessage
-                    if (message !== 'Please enter a number.')
-                      return setCapacityError(message)
+                      const message = e.target.validationMessage
+                      if (message !== 'Please enter a number.')
+                        return setCapacityError(message)
 
-                    return setCapacityError(
-                      'Invalid exponential (correct format is `1e1`), or must be smaller than 1.208e24',
-                    )
-                  }}
-                  /* Once validation passes the values *can* be directly attached to state - but that'd cause unnecessary re-renders */
-                  onBlur={(e) => {
-                    if (!open || !inputRefs.current.capacity.reportValidity()) return
-
-                    const v = e.target.value
-                    if (v === capacity) return
-
-                    if (v > 1.208e24)
                       return setCapacityError(
-                        // Documented on README
-                        'Capacity cannot be bigger than 1.208e24 GB / 1024 GeB',
+                        `Invalid exponential format (e.g. "1e1'), or too big. Values must be smaller than ~1.8e+308`,
                       )
+                    }}
+                    onBlur={() => inputRefs.current.capacity.reportValidity()}
+                    onChange={(e) => {
+                      if (!open || !inputRefs.current.capacity.reportValidity())
+                        return
 
-                    if (v % 1 !== 0)
-                      return setCapacityError(
-                        `Capacity must be in integers / round-numbers.
+                      const v = Number(e.target.value)
+                      if (v === capacity) return
+
+                      if (v > MAX_CAPACITY)
+                        return setCapacityError(
+                          `Capacity cannot be bigger than ${MAX_CAPACITY} GB / 1024 GeB`,
+                        )
+
+                      if (v % 1 !== 0)
+                        return setCapacityError(
+                          `Capacity must be in integers / round-numbers.
                          The two nearest valid numbers are
                          ${Math.floor(v)} and ${Math.ceil(v)}`,
-                      )
+                        )
 
-                    return setCapacityError(null)
-                  }}
-                  required
-                />
-                <ValidationError message={errors.capacity ?? ''} />
+                      return setCapacityError(null)
+                    }}
+                  />
+                  <span
+                    className={cn(
+                      'absolute right-14 text-gray-400',
+                      !showCapacityConversion() && 'hidden',
+                    )}
+                  >
+                    {chosenCapacity &&
+                    chosenCapacity.value &&
+                    chosenCapacity.value > 1023 ? (
+                      chosenCapacity.value < MAX_CAPACITY ? (
+                        <>
+                          (equivalent to&nbsp;
+                          {calculateCapacity(chosenCapacity.value)})
+                        </>
+                      ) : (
+                        <> {chosenCapacity.value < 1e35 ? '(not supported)' : ''} </>
+                      )
+                    ) : (
+                      ''
+                    )}
+                  </span>
+                </div>
+                <ValidationError message={errors.capacity} />
               </div>
               <button className='hidden' onClick={submitOrFocusOnFirstInvalid}>
                 silent submit
@@ -265,7 +319,13 @@ export default function CrudDialog({
           {lowerCaseVariant !== 'remove' ? (
             <DialogClose
               className='bg-[#337AB7] text-white  hover:bg-[#0054AE]'
-              onClick={submitOrFocusOnFirstInvalid}
+              onClick={(e) => {
+                for (const ref of Object.values(inputRefs.current)) {
+                  /* UI edge case: Clicking this btn will not force validate the entire form. */
+                  ref.reportValidity()
+                }
+                submitOrFocusOnFirstInvalid(e)
+              }}
             >
               {VARIANTS[lowerCaseVariant].actionText}
             </DialogClose>

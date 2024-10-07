@@ -15,7 +15,7 @@ import {
 } from '@/components/shadcn/table'
 import Tooltip from '@/components/shadcn/tooltip'
 import useQueryParam from '@/hooks/use-query-param'
-import { TYPE_ICONS } from '@/lib/utils'
+import { MAX_CAPACITY, TYPE_ICONS } from '@/lib/utils'
 import {
   flexRender,
   getCoreRowModel,
@@ -44,7 +44,7 @@ const DUMMY = Object.freeze([
   {
     id: '3u1reuv4',
     system_name: 'DESKTOP-0VCBIFF',
-    hdd_capacity: 1.208e24,
+    hdd_capacity: MAX_CAPACITY,
     type: 'linux',
   },
   {
@@ -66,7 +66,6 @@ NoResults.displayName = 'NoResults'
 
 const TYPE_FILTER_OPTIONS = Object.freeze(
   Object.entries(TYPE_ICONS).map(([k, v]) => ({
-    label: 'type',
     value: k,
     icon: v,
   })),
@@ -255,7 +254,8 @@ export default function DataTable({ create, update, remove, reset, data = DUMMY 
             <Input
               autoFocus
               autoComplete='on'
-              id='gFilter'
+              maxLength='22' /* `m` overflows then */
+              name='gFilter'
               value={globalFilter}
               className='pl-8'
               placeholder='Search anything within all devices'

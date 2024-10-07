@@ -48,6 +48,8 @@ const CAPACITY_TIERS = Object.freeze({
   7: 'Ge',
 })
 
+export const MAX_CAPACITY = 1.208e24 // Documented on README
+
 // For consistency's sake
 export const capitalize = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()

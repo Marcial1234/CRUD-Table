@@ -39,14 +39,12 @@ CommandDialog.displayName = 'CommandDialog'
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div
-    className='m-auto ml-[0.3rem] flex items-center border-b pl-[0.7rem] pr-4'
-    cmdk-input-wrapper=''
-  >
-    <SearchIcon className='ml-[0.0625rem] mr-2 h-3' />
+>(({ className, maxLength, ...props }, ref) => (
+  <div className='mx-[0.34rem] flex items-center border-b' cmdk-input-wrapper=''>
+    <SearchIcon className='mx-2 h-3' />
     <CommandPrimitive.Input
       ref={ref}
+      maxLength={maxLength ?? 20}
       className={cn(
         'flex h-11 w-full rounded-md bg-transparent py-3 pl-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
         className,
@@ -91,7 +89,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'mr-[-0.325rem] overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground ',
+      'overflow-hidden py-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground ',
       className,
     )}
     {...props}
@@ -106,7 +104,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
-    className={cn('ml-[0.059rem] h-[0.8px] bg-border', className)}
+    className={cn('h-[0.8px] bg-border', className)}
     {...props}
   />
 ))

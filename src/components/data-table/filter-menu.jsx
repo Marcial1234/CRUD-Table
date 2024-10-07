@@ -12,12 +12,13 @@ import {
 } from '@/components/shadcn/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import Separator from '@/components/shadcn/separator'
+import Tooltip from '@/components/shadcn/tooltip'
 import { capitalize, cn } from '@/lib/utils'
 import { CheckIcon } from '@radix-ui/react-icons'
 
 function Skeleton({ title }) {
   return (
-    <Button variant='outline' disabled className='w-60 border-dashed font-normal'>
+    <Button variant='outline' disabled className='border-dashed font-normal'>
       <FilterIcon className='mr-2' />
       Filter by {title}
     </Button>
@@ -31,6 +32,20 @@ export default function Menu({ column, title, options, disabled = false }) {
   const facets = column.getFacetedUniqueValues()
   const facetsKeys = Array.from(new Map([...facets]).keys())
   const selectedValues = new Set(column.getFilterValue())
+  const btnWidth = 'w-60'
+  const innerWidth = 'w-56'
+
+  function SelectedTooltip({ children }) {
+    const expansion = Array.from(selectedValues.values().map((v) => `'${v}'`))
+    return (
+      <Tooltip
+        content={`${title}s: ${expansion.join(' and ')}
+          ${options.length === selectedValues.size ? ' (noop)' : ''}`}
+      >
+        {children}
+      </Tooltip>
+    )
+  }
 
   // Since we're mapping 'mac' => 'macapple', we need a partial search-match
   const findPartialKey = (value) =>
@@ -42,25 +57,41 @@ export default function Menu({ column, title, options, disabled = false }) {
         <Button
           variant='outline'
           className={cn(
-            'w-60 border-dashed font-normal focus:border-none focus:bg-secondary-hover-background',
+            `${btnWidth} border-dashed font-normal focus:border-none focus:bg-secondary-hover-background`,
             selectedValues.size > 0
               ? 'border-none bg-accent hover:bg-accent focus:bg-accent'
               : '',
           )}
         >
           <FilterIcon className='mr-2' />
-          Filter{selectedValues.size > 0 ? <>ed by</> : <> by {title}</>}
+          Filter
+          {selectedValues.size > 0 ? (
+            <>
+              ed {title.split(' ')[title.split(' ').length - 1]}
+              {selectedValues.size > 1 && 's'}
+            </>
+          ) : (
+            <> by {title}</>
+          )}
           {selectedValues.size > 0 && (
             <>
               <Separator orientation='vertical' className='mx-2 h-4' />
-              <Badge className='rounded-sm px-1 font-normal lg:hidden'>
-                {selectedValues.size}
-              </Badge>
+              <SelectedTooltip>
+                <Badge className='rounded-sm px-1 font-normal lg:hidden'>
+                  {selectedValues.size === options.length
+                    ? 'Showing all'
+                    : selectedValues.size}
+                </Badge>
+              </SelectedTooltip>
               <div className='hidden space-x-0.5 lg:flex lg:space-x-2'>
                 {selectedValues.size > 2 ? (
-                  <Badge className='rounded-sm px-1 font-normal'>
-                    {selectedValues.size} selected
-                  </Badge>
+                  <SelectedTooltip>
+                    <Badge className='rounded-sm px-1 font-normal'>
+                      {selectedValues.size === options.length
+                        ? `Showing all (noop)`
+                        : `${selectedValues.size} selected`}
+                    </Badge>
+                  </SelectedTooltip>
                 ) : (
                   options
                     .filter((option) => selectedValues.has(option.value))
@@ -78,25 +109,30 @@ export default function Menu({ column, title, options, disabled = false }) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='max-w-60' align='start'>
+      <PopoverContent className={`${btnWidth}`} align='start'>
         <Command
           loop={true}
-          className=' w-48 min-w-56 text-center '
-          filter={(value, search) => {
-            if (value.toLowerCase().includes('clear')) return 0.5
-            if (value.toLowerCase().includes(search)) return 1
+          className={`${innerWidth} text-center`}
+          filter={(value, search, keywords) => {
+            const s = search.toLowerCase()
+            let extendedValue = value.toLowerCase()
+            if (keywords.length > 0) extendedValue += ` ${keywords.join(' ')}`
+
+            if (extendedValue.includes(s)) return 1
             return 0
           }}
         >
           <CommandInput autoFocus placeholder={title} />
           <CommandList>
-            <CommandEmpty>No {title.toLowerCase()} found</CommandEmpty>
+            <CommandEmpty>Invalid {title.toLowerCase()}</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => {
+              {options.map((option, i) => {
                 let isSelected = selectedValues.has(option.value)
                 return (
                   <CommandItem
-                    key={option.value}
+                    key={i}
+                    className='mx-1 flex items-center gap-1'
+                    keywords={option.value.toLowerCase() === 'mac' ? ['apple'] : []}
                     onSelect={() => {
                       if (isSelected) selectedValues.delete(option.value)
                       else selectedValues.add(option.value)
@@ -106,7 +142,6 @@ export default function Menu({ column, title, options, disabled = false }) {
                         : Array.from(selectedValues)
                       column.setFilterValue(filters)
                     }}
-                    className='mx-1 flex items-center gap-1'
                   >
                     {/* Checked box with optionally invisible black check icon */}
                     <div
@@ -124,6 +159,7 @@ export default function Menu({ column, title, options, disabled = false }) {
                       <span className='mr-1'> {option.icon}</span>
                       {capitalize(option.value)}
                       {/* Faceted Value */}
+                      &nbsp;
                       <span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-sm'>
                         {facets.get(findPartialKey(option.value))}
                       </span>
@@ -133,7 +169,7 @@ export default function Menu({ column, title, options, disabled = false }) {
               })}
               {selectedValues.size > 0 && (
                 <>
-                  <CommandSeparator className='mt-1' />
+                  <CommandSeparator className={`mx-[0.34rem] mt-1`} />
                   <CommandItem
                     onSelect={() => column.setFilterValue(undefined)}
                     className='mx-1 mt-1 justify-center text-center '

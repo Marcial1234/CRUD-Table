@@ -18,7 +18,7 @@ export default function Loader() {
     <>
       <div className='flex items-center justify-between pb-3 pt-2 text-2xl font-medium'>
         Devices
-        <Button className='animate-pulse bg-muted text-transparent'>
+        <Button disabled className='animate-pulse bg-muted text-transparent'>
           + &nbsp; Add device
         </Button>
       </div>
@@ -27,7 +27,11 @@ export default function Loader() {
         <div className='flex flex-wrap gap-3'>
           <div className='flex flex-col space-y-3'>
             <div className='flex w-80 animate-pulse items-center bg-muted text-transparent'>
-              <Input className='bg-muted pl-8 disabled:opacity-0' disabled />
+              <Input
+                id='skeleton'
+                className='bg-muted pl-8 disabled:opacity-0'
+                disabled
+              />
             </div>
           </div>
           <FilterMenu disabled title='Bananas' />
