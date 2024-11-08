@@ -59,7 +59,7 @@ The look and feel of the app should not be affected by device width. However, on
 Capacity units get simplified to their nearest higher unit with two decimals above `1024GB` on the table. However, their raw values delimited by commas are still available once you hover over a row.
 
 Maintaining the raw data allows for future unit changes and migrations.
-The max allowed by the UI is: <pre>`1.208 * 10`<sup>`24`</sup>` GB`</pre> which is roughtly equivalent to `1024 GeB` (1024 Geopbytes <sup>[[1]](https://en.wiktionary.org/wiki/geopbyte)[[2]](https://itlaw.fandom.com/wiki/Geopbyte)</sup>), which is the next unite of storage. The next unit was not included as its naming is not settled as of yet, and what was was included should be enough for the 2020s-2030s data needs.
+The max allowed by the UI is: <pre>`1.208 * 10`<sup>`24`</sup>` GB`</pre> which is roughtly equivalent to `1024 GeB` (1024 Geopbytes <sup>[[1]](https://en.wiktionary.org/wiki/geopbyte)[[2]](https://itlaw.fandom.com/wiki/Geopbyte)</sup>). No next unit was included as its naming is not settled as of yet, and what was was included should be enough for the 2020s-2030s data needs.
 
 ### Deep Search
 
